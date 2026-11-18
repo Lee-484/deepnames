@@ -532,3 +532,5 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
   .score span { font-size: 11px; letter-spacing: .04em; }
   .score b { font-size: 22px; }
 }
+
+.build { margin: 0; font-family: var(--label); font-size: 11px; letter-spacing: .12em; color: #7d6d55; text-align: center; }

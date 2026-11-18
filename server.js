@@ -19,11 +19,30 @@ function originOf(req) {
   return `${proto}://${host}`;
 }
 
+// A build id from the files themselves. The page links its scripts and styles with
+// ?v=<build>, so every deploy forces browsers to fetch the new files.
+const BUILD = (() => {
+  const h = require("crypto").createHash("sha1");
+  for (const f of fs.readdirSync(PUBLIC).sort()) { try { h.update(f); h.update(fs.readFileSync(path.join(PUBLIC, f))); } catch {} }
+  return h.digest("hex").slice(0, 8);
+})();
+const COMMIT = (process.env.RENDER_GIT_COMMIT || "").slice(0, 7);
+let indexHtml = null;
+function sendIndex(res) {
+  if (!indexHtml) {
+    indexHtml = fs.readFileSync(path.join(PUBLIC, "index.html"), "utf8")
+      .replace(/(src|href)="\/(app\.js|fx\.js|style\.css)"/g, `$1="/$2?v=${BUILD}"`)
+      .replace("{{BUILD}}", `build ${BUILD}${COMMIT ? ` · ${COMMIT}` : ""}`);
+  }
+  res.writeHead(200, { "Content-Type": MIME[".html"], "Cache-Control": "no-store" });
+  res.end(indexHtml);
+}
+
 function sendFile(res, file, status = 200) {
   fs.readFile(file, (err, buf) => {
     if (err) { res.writeHead(404, { "Content-Type": "text/plain" }); return res.end("Not found"); }
     const ext = path.extname(file);
-    res.writeHead(status, { "Content-Type": MIME[ext] || "application/octet-stream", "Cache-Control": ext === ".html" ? "no-cache" : "public, max-age=300" });
+    res.writeHead(status, { "Content-Type": MIME[ext] || "application/octet-stream", "Cache-Control": "no-cache" });
     res.end(buf);
   });
 }
@@ -32,6 +51,7 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x");
   const p = decodeURIComponent(url.pathname);
   if (p === "/healthz") { res.writeHead(200, { "Content-Type": "text/plain" }); return res.end("ok"); }
+  if (p === "/version") { res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" }); return res.end(JSON.stringify({ build: BUILD, commit: COMMIT || null })); }
   const qr = p.match(/^\/qr\/([A-Za-z]{4})\.svg$/);
   if (qr) {
     const link = `${originOf(req)}/r/${qr[1].toUpperCase()}`;
@@ -41,7 +61,7 @@ const server = http.createServer(async (req, res) => {
       return res.end(svg);
     } catch { res.writeHead(500); return res.end(); }
   }
-  if (p === "/" || /^\/r\/[A-Za-z]{4}\/?$/.test(p)) return sendFile(res, path.join(PUBLIC, "index.html"));
+  if (p === "/" || p === "/index.html" || /^\/r\/[A-Za-z]{4}\/?$/.test(p)) return sendIndex(res);
   const file = path.normalize(path.join(PUBLIC, p));
   if (!file.startsWith(PUBLIC + path.sep)) { res.writeHead(403); return res.end(); }
   sendFile(res, file);

@@ -643,6 +643,7 @@ function effects(a, b) {
   if (!b || !b.game) return;
   const g = b.game, m = b.players.find((p) => p.id === b.you) || {};
   if (!a || !a.game || a.game.id !== g.id) {
+    if (window.FX) FX.clear(); // never carry smoke or darkness into a new game
     if (a) {
       overlayFor = null; sfx.start(); sfx.deal();
       setTimeout(() => banner(`${TEAM[g.first]} goes first`, m.team === g.first ? "Your side has 7 agents" : "20 cards dealt", g.first), 900);
@@ -669,8 +670,9 @@ function effects(a, b) {
   });
   if (og.phase === "clue" && g.phase === "guess") { sfx.bell(); banner(`${g.clue.word} · ${g.clue.n === "inf" ? "∞" : g.clue.n}`, `${TEAM[g.turn]} clue from ${g.clue.by}`, g.turn); }
   if (og.phase !== "over" && g.phase === "over") {
-    if (g.reason === "assassin") setTimeout(() => window.FX && FX.doom(), 500);
-    else if (g.winner) setTimeout(() => { sfx.win(); window.FX && FX.celebrate(g.winner); }, 600);
+    const sameGame = () => S && S.game && S.game.id === g.id && S.game.phase === "over";
+    if (g.reason === "assassin") setTimeout(() => sameGame() && window.FX && FX.doom(), 500);
+    else if (g.winner) setTimeout(() => { if (!sameGame()) return; sfx.win(); window.FX && FX.celebrate(g.winner); }, 600);
   }
   if (g.phase === "clue" && og.turn !== g.turn && og.phase !== "over") {
     setTimeout(() => banner(`${POSS[g.turn]} turn`, m.team === g.turn ? (m.role === "spy" ? "Give your clue" : "Your spymaster is thinking") : "", g.turn), 900);

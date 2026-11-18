@@ -41,15 +41,15 @@ let parts = [], rings = [], smokes = [];
 const rand = (a, b) => a + Math.random() * (b - a);
 
 function burst(x, y, color, { n = 40, speed = 5, gravity = .08, life = 60, size = 2.2, kind = "spark", spread = Math.PI * 2, dir = -Math.PI / 2 } = {}) {
-  if (reduce) return;
+  if (reduce || document.hidden) return;
   for (let i = 0; i < n; i++) {
     const a = dir + rand(-spread / 2, spread / 2), s = rand(.25, 1) * speed;
     parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, g: gravity, life: life * rand(.6, 1.2), max: 0, size: size * rand(.5, 1.4), color, kind, rot: rand(0, 6.28), vr: rand(-.2, .2) });
   }
 }
-function ring(x, y, color, max = 160, width = 4, life = 40) { if (!reduce) rings.push({ x, y, color, r: 4, max, width, life, t: 0 }); }
+function ring(x, y, color, max = 160, width = 4, life = 40) { if (!reduce && !document.hidden) rings.push({ x, y, color, r: 4, max, width, life, t: 0 }); }
 function smoke(x, y, { n = 26, color = "0,0,0", spread = 60, life = 110, grow = 1.6, size = 26 } = {}) {
-  if (reduce) return;
+  if (reduce || document.hidden) return;
   for (let i = 0; i < n; i++) smokes.push({ x: x + rand(-spread, spread) * .4, y: y + rand(-spread, spread) * .3, vx: rand(-1.4, 1.4), vy: rand(-1.6, .2), r: size * rand(.5, 1.2), grow: grow * rand(.6, 1.3), a: rand(.35, .7), life: life * rand(.7, 1.2), t: 0, color });
 }
 
@@ -81,7 +81,7 @@ function reveal(el, role, good) {
 }
 
 let darkUntil = 0, darkFor = 1;
-function darken(ms) { darkUntil = performance.now() + ms; darkFor = ms; }
+function darken(ms) { if (document.hidden) return; darkUntil = performance.now() + ms; darkFor = ms; }
 
 function celebrate(team) {
   if (reduce) return;
@@ -98,8 +98,30 @@ function doom() {
   darken(2600);
 }
 
+// Wipe every effect at once (new game, tab coming back, or after an error).
+function clear() {
+  parts = []; rings = []; smokes = []; darkUntil = 0; tint = null;
+  fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  fctx.globalAlpha = 1; fctx.globalCompositeOperation = "source-over";
+  fctx.clearRect(0, 0, W, H);
+}
+// Effects started while the tab is hidden would replay late, so drop them and
+// start clean when the player comes back.
+document.addEventListener("visibilitychange", () => { if (!document.hidden) clear(); });
+
 // ---------- main loop ----------
+// Effect lifetimes advance by real elapsed time (in 60 fps "frames"), so they
+// always finish on schedule on any monitor, and an error can never stop the loop
+// and leave a frame frozen on screen.
+let lastT = 0, step = 1;
 function frame(t) {
+  step = lastT ? Math.min(6, Math.max(.25, (t - lastT) / 16.667)) : 1;
+  lastT = t;
+  try { draw(t); }
+  catch (e) { clear(); }
+  requestAnimationFrame(frame);
+}
+function draw(t) {
   // embers
   actx.clearRect(0, 0, W, H);
   const want = emberCount();
@@ -127,7 +149,7 @@ function frame(t) {
     fctx.fillStyle = g; fctx.fillRect(0, 0, W, H);
   }
   if (smokes.length) {
-    smokes = smokes.filter((s) => (s.t += 1) < s.life);
+    smokes = smokes.filter((s) => (s.t += step) < s.life);
     for (const s of smokes) {
       s.x += s.vx; s.y += s.vy; s.vx *= .985; s.vy *= .985; s.r += s.grow;
       const k = 1 - s.t / s.life;
@@ -137,7 +159,7 @@ function frame(t) {
     }
   }
   if (rings.length) {
-    rings = rings.filter((r) => (r.t += 1) < r.life);
+    rings = rings.filter((r) => (r.t += step) < r.life);
     for (const r of rings) {
       const k = r.t / r.life, e = 1 - Math.pow(1 - k, 3);
       fctx.strokeStyle = r.color; fctx.globalAlpha = 1 - k; fctx.lineWidth = r.width * (1 - k) + .5;
@@ -146,7 +168,7 @@ function frame(t) {
     fctx.globalAlpha = 1;
   }
   if (parts.length) {
-    parts = parts.filter((p) => (p.max += 1) < p.life);
+    parts = parts.filter((p) => (p.max += step) < p.life);
     for (const p of parts) {
       p.vy += p.g; p.vx *= p.kind === "dust" ? .96 : .985; p.vy *= p.kind === "dust" ? .96 : .99;
       p.x += p.vx; p.y += p.vy; p.rot += p.vr;
@@ -169,9 +191,8 @@ function frame(t) {
     }
     fctx.globalAlpha = 1;
   }
-  requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
-window.FX = { burst, ring, smoke, reveal, celebrate, doom, darken, center, reduce };
+window.FX = { burst, ring, smoke, reveal, celebrate, doom, darken, center, clear, reduce };
 })();

@@ -1,0 +1,10 @@
+# One-click deploy on Render (https://render.com): New → Blueprint → pick this repo.
+services:
+  - type: web
+    name: deepnames
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    autoDeploy: true

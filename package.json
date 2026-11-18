@@ -1,0 +1,22 @@
+{
+  "name": "deepnames",
+  "version": "1.0.0",
+  "description": "Deepnames: a Deepwoken-themed, real-time multiplayer take on Codenames.",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/game.test.js && node test/socket.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deepnames</title>
+<meta name="description" content="A Deepwoken word-spy party game. Etreans against the Authority. Don't wake Ethiron.">
+<meta name="theme-color" content="#15100c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;800&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="g-E" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"><path d="M32 4l6 14v40H26V18z"/><path d="M14 58V30l12-6M50 58V30l-12-6M8 58h48"/><path d="M32 26v8"/></g><circle cx="32" cy="16" r="2.6" fill="currentColor"/></symbol>
+    <symbol id="g-A" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2"><path d="M32 5l22 8v17c0 14-9 24-22 29C19 54 10 44 10 30V13z"/><path d="M32 16v32M21 26h22"/></g></symbol>
+    <symbol id="g-B" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="3.2"><path d="M32 6c-10 0-16 8-16 18 0 6 2 10 5 13l-9 21h40l-9-21c3-3 5-7 5-13 0-10-6-18-16-18z"/><path d="M24 26c2-4 14-4 16 0"/></g></symbol>
+    <symbol id="g-X" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.6"><path d="M4 32C14 16 50 16 60 32 50 48 14 48 4 32z"/><circle cx="32" cy="32" r="11"/><path d="M32 6v6M32 52v6M14 12l4 5M50 12l-4 5M14 52l4-5M50 52l-4-5"/></g><path d="M32 22c3 4 3 16 0 20-3-4-3-16 0-20z" fill="currentColor"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M4 9h4l5-4v14l-5-4H4zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M4 9h4l5-4v14l-5-4H4zM16 9l5 6M21 9l-5 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path fill="currentColor" d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></symbol>
+  </defs>
+</svg>
+
+<div id="conn" class="conn" hidden>Reconnecting to the Depths…</div>
+
+<!-- ============ HOME ============ -->
+<main id="home" class="screen home">
+  <div class="home-card">
+    <h1 class="wordmark">Deepnames</h1>
+    <p class="tagline">A word-spy game in the Depths. Etreans against the Authority. Don't wake Ethiron.</p>
+
+    <label class="field" for="nameInput"><span>Your name</span>
+      <input id="nameInput" maxlength="20" autocomplete="nickname" placeholder="e.g. Ashvane" enterkeyhint="go">
+    </label>
+
+    <div id="joinFromLink" class="join-link" hidden>
+      <p>You've been invited to room <b id="linkCode"></b></p>
+      <button id="joinLinkBtn" class="btn gold big" type="button">Join room</button>
+      <button id="notThisRoom" class="btn ghost" type="button">Make my own room instead</button>
+    </div>
+
+    <div id="homeActions" class="home-actions">
+      <button id="createBtn" class="btn gold big" type="button">Create a room</button>
+      <div class="divider"><span>or join one</span></div>
+      <div class="join-row">
+        <label class="sr" for="codeInput">Room code</label>
+        <input id="codeInput" class="code-input" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="join">
+        <button id="joinBtn" class="btn" type="button">Join</button>
+      </div>
+    </div>
+    <p id="homeError" class="error" role="alert"></p>
+    <details class="rules">
+      <summary>How to play</summary>
+      <ul>
+        <li>Split into <b class="tE">Etreans</b> and the <b class="tA">Authority</b>. Each side picks one <b>spymaster</b>; everyone else is an <b>operative</b>.</li>
+        <li>20 words are dealt. Only the spymasters can see which words belong to which side.</li>
+        <li>On your turn, your spymaster gives a <b>one-word clue</b> and a <b>number</b>: how many cards it points to.</li>
+        <li>Operatives tap cards to suggest them, then press <b>Reveal</b>. You can keep guessing while you're right, up to the number plus one.</li>
+        <li>A <b>bystander</b> or the other side's card ends your turn. Revealing <b>Ethiron</b> loses the game instantly.</li>
+        <li>First side to find all its agents wins. The side that goes first has 7 agents; the other has 6.</li>
+      </ul>
+    </details>
+  </div>
+</main>
+
+<!-- ============ LOBBY ============ -->
+<main id="lobby" class="screen lobby" hidden>
+  <header class="topbar">
+    <span class="wordmark small">Deepnames</span>
+    <div class="topbar-right">
+      <button class="icon-btn" data-sound type="button" aria-label="Toggle sound"><svg><use href="#i-sound"/></svg></button>
+      <button class="btn ghost slim" data-leave type="button">Leave</button>
+    </div>
+  </header>
+
+  <div class="lobby-grid">
+    <section class="panel invite">
+      <h2 class="label">Invite your party</h2>
+      <div class="invite-body">
+        <img class="qr" id="lobbyQr" alt="QR code to join this room" width="168" height="168">
+        <div class="invite-text">
+          <span class="label dim">Room code</span>
+          <span class="room-code" id="lobbyCode">----</span>
+          <span class="link" id="lobbyLink"></span>
+          <div class="btn-row">
+            <button class="btn slim" data-copy type="button">Copy link</button>
+            <button class="btn slim" data-share type="button" hidden>Share</button>
+          </div>
+        </div>
+      </div>
+      <p class="hint">Scan the code with a phone camera, or open the link. Everyone shows up below as they join.</p>
+    </section>
+
+    <section class="panel me-panel">
+      <h2 class="label">You</h2>
+      <form id="renameForm" class="rename">
+        <label class="sr" for="renameInput">Your name</label>
+        <input id="renameInput" maxlength="20" autocomplete="nickname">
+        <button class="btn slim" type="submit">Rename</button>
+      </form>
+      <p class="hint" id="meHint"></p>
+    </section>
+
+    <section class="teams" id="lobbyTeams"></section>
+
+    <section class="panel start-panel" id="startPanel"></section>
+
+    <section class="panel settings" id="settingsPanel"></section>
+  </div>
+</main>
+
+<!-- ============ GAME ============ -->
+<main id="game" class="screen game" hidden>
+  <header class="topbar">
+    <span class="wordmark small">Deepnames</span>
+    <div class="scores" id="scores"></div>
+    <div class="topbar-right">
+      <button class="chip-btn" data-invite type="button" id="gameCode">----</button>
+      <button class="icon-btn" data-sound type="button" aria-label="Toggle sound"><svg><use href="#i-sound"/></svg></button>
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+    </div>
+  </header>
+
+  <div class="game-grid">
+    <aside class="team-side" id="sideE"></aside>
+    <section class="center">
+      <div class="turn-panel" id="turnPanel" aria-live="polite"></div>
+      <div class="board" id="board"></div>
+      <div class="viewer-note" id="viewerNote"></div>
+    </section>
+    <aside class="team-side" id="sideA"></aside>
+    <section class="panel log-panel">
+      <h2 class="label">Dive log</h2>
+      <ol id="log" class="log"></ol>
+    </section>
+  </div>
+</main>
+
+<!-- ============ OVERLAYS ============ -->
+<div id="overlay" class="overlay" hidden></div>
+<div id="sheet" class="sheet" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

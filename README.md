@@ -24,7 +24,7 @@ A Deepwoken-themed, real-time multiplayer take on Codenames. The **Ministry** fa
 - Host tools: shuffle teams, remove players, hand over hosting, end the game, rematch (with or without rotating spymasters).
 - Players reconnect to the same seat after a refresh or a dropped connection.
 - Animated dealing and card flips, particle bursts, turn banners, ambient embers, sound effects, a Vantablack Warrior ending and victory screens.
-- Word packs: 563 names taken from the Deepwoken wiki categories (races, oaths, attunements, locations, dungeons, monsters, bosses, NPCs, weapons, relics, mechanics), plus an optional everyday-words pack and custom words set in the lobby. Edit `words.js` to change them.
+- Word packs: 557 names taken from the Deepwoken wiki categories (races, oaths, attunements, locations, dungeons, monsters, bosses, NPCs, weapons, relics, mechanics), plus an optional everyday-words pack and custom words set in the lobby. Edit `words.js` to change them.
 
 ## Run it locally
 

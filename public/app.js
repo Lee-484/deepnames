@@ -213,10 +213,17 @@ function canGuess() {
 
 // ---------- render ----------
 const seenPlayers = new Set();
+const tableApi = {
+  act: (type, data = {}, quiet = false) => quiet ? emit("act", { type, ...data }) : act(type, data),
+  leave: () => leaveRoom(),
+  roomLink: (code) => roomLink(code),
+  clockOffset: () => clockOffset,
+  saveName: (n) => store.set("dn.name", n),
+};
 function render() {
   if (!S) return;
-  if (!S.game) { show("lobby"); renderLobby(); }
-  else { show("game"); renderGame(); }
+  if (!S.game) { show("lobby"); renderLobby(); window.Table && Table.hide(); }
+  else { show("game"); window.Table && Table.update(S, prev, tableApi); }
   if (sheetOpen) renderSheet();
   S.players.forEach((p) => seenPlayers.add(p.id));
 }
@@ -617,7 +624,6 @@ function updateTimer() {
   }
   if (bar) bar.style.transform = `scaleX(${total ? left / total : 0})`;
 }
-setInterval(updateTimer, 250);
 
 function showResult() {
   const g = S.game, ov = $("#overlay");
@@ -640,6 +646,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("#over
 
 // ---------- effects: sounds + animations driven by state changes ----------
 function effects(a, b) {
+  if (b && b.game) return;            // the 3D table plays its own sounds and effects
   if (!b || !b.game) return;
   const g = b.game, m = b.players.find((p) => p.id === b.you) || {};
   if (!a || !a.game || a.game.id !== g.id) {
@@ -685,7 +692,6 @@ function effects(a, b) {
 // ---------- side sheet (menu + invite) ----------
 function openSheet(kind) { sheetOpen = kind; renderSheet(); }
 function closeSheet() { sheetOpen = null; const s = $("#sheet"); s.hidden = true; s.innerHTML = ""; }
-$("#menuBtn").onclick = () => openSheet("menu");
 let pendingConfirm = null;
 function confirmBox(text, label, fn) { pendingConfirm = { text, label, fn }; openSheet(sheetOpen || "confirm"); }
 function renderSheet() {

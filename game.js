@@ -40,7 +40,7 @@ class Room {
     this.hostId = null;
     this.seq = 0;
     this.kicked = new Set();
-    this.settings = { timer: 0, packs: defaultPacks(), custom: [] };
+    this.settings = { timer: 90, packs: defaultPacks(), custom: [] };
     this.game = null;
     this.onChange = onChange || (() => {});
     this.timer = null;

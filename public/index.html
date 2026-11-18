@@ -11,8 +11,9 @@
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;800&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;800&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,500&display=swap">
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/table.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -122,31 +123,44 @@
 </main>
 
 <!-- ============ GAME ============ -->
-<main id="game" class="screen game" hidden>
-  <header class="topbar">
-    <span class="wordmark small">Deepnames</span>
-    <div class="scores" id="scores"></div>
-    <div class="topbar-right">
-      <button class="chip-btn" data-invite type="button" id="gameCode">----</button>
-      <button class="icon-btn" data-sound type="button" aria-label="Toggle sound"><svg><use href="#i-sound"/></svg></button>
-      <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+<main id="game" class="screen game" hidden><div class="stage"><div class="canvas" id="canvas">
+    <div class="scene" id="scene">
+      <div class="table" id="table">
+        <div class="top"><div class="lightpool"></div></div>
+        <div class="edge"></div>
+        <svg class="rimfuse" id="rimfuse" viewBox="0 0 1060 680" aria-hidden="true"><path id="rimPath" d="M64 44 H990 Q1018 44 1018 72 V610 Q1018 638 990 638 H70 Q42 638 42 610 V92"/></svg>
+        <canvas class="ropecv" id="ropecv" width="2120" height="1360" aria-hidden="true"></canvas>
+        <i id="burnpt" class="burnpt"></i>
+        <div class="grid" id="grid"></div>
+      </div>
     </div>
-  </header>
-
-  <div class="game-grid">
-    <aside class="team-side" id="sideE"></aside>
-    <section class="center">
-      <div class="turn-panel" id="turnPanel" aria-live="polite"></div>
-      <div class="board" id="board"></div>
-      <div class="viewer-note" id="viewerNote"></div>
-    </section>
-    <aside class="team-side" id="sideA"></aside>
-    <section class="panel log-panel">
-      <h2 class="label">Dive log</h2>
-      <ol id="log" class="log"></ol>
-    </section>
-  </div>
-</main>
+    <div class="tablet" id="tablet"></div>
+    <div class="fuseflame" id="fuseflame" aria-hidden="true"><canvas id="firecv" width="320" height="440"></canvas></div>
+    <canvas id="goldgl" width="1280" height="820" aria-hidden="true"></canvas>
+    <canvas id="ropegl" width="1280" height="820" aria-hidden="true"></canvas>
+    <div class="motes"></div>
+    <div class="hud room plaque"><button type="button" class="qrtile" id="qrTile" aria-label="Show invite QR code"><img id="qrImg" alt="QR code to join this room"></button><div class="pl-text"><span class="logo">Deepnames</span><button type="button" class="roomtag" id="roomTag" title="Copy invite link"><span>Room</span><b id="roomCode">----</b><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V6a1 1 0 011-1h9" fill="none" stroke="currentColor" stroke-width="2"/></svg></button></div><button type="button" class="menubtn gearbtn" id="menuBtn" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 000-2l2-1.6-2-3.4-2.4 1a7.4 7.4 0 00-1.7-1L15 3.5h-4l-.4 2.5a7.4 7.4 0 00-1.7 1l-2.4-1-2 3.4L6.6 11a7.6 7.6 0 000 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 001.7 1l.4 2.5h4l.4-2.5a7.4 7.4 0 001.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg></button></div>
+    <div class="hud hero me E"><div class="portrait" id="pE"></div><div class="hinfo"><span class="n">Ministry</span><div class="crew" id="crewE"></div><div class="agents E" id="agentsE"></div></div></div>
+    <div class="hud hero them A"><div class="portrait" id="pA"></div><div class="hinfo"><span class="n">Authority</span><div class="crew" id="crewA"></div><div class="agents A" id="agentsA"></div></div></div>
+    <div class="flagglow l" id="glowE"></div><div class="flagglow r" id="glowA"></div><div class="flag2d l" id="flagE"><b class="anc" data-a="barL" style="left:2px;top:28px"></b><b class="anc" data-a="barL2" style="left:2px;top:40px"></b><b class="anc" data-a="barR" style="left:148px;top:28px"></b><b class="anc" data-a="barR2" style="left:148px;top:40px"></b><b class="anc" data-a="fin" style="left:75px;top:4px"></b><b class="anc" data-a="poleTop" style="left:75px;top:14px"></b><b class="anc" data-a="rodMid" style="left:75px;top:28px"></b><b class="anc" data-a="ring1" style="left:24px;top:28px"></b><b class="anc" data-a="ring2" style="left:51px;top:28px"></b><b class="anc" data-a="ring3" style="left:75px;top:28px"></b><b class="anc" data-a="ring4" style="left:99px;top:28px"></b><b class="anc" data-a="ring5" style="left:126px;top:28px"></b><b class="anc" data-a="tip" style="left:75px;top:282px"></b><b class="anc" data-a="poleBot" style="left:75px;top:440px"></b><i class="pole2d"></i><i class="collar"></i><i class="spike"></i><canvas class="cloth" width="268" height="524"></canvas><i class="ring2d" style="--x:16%"></i><i class="ring2d" style="--x:34%"></i><i class="ring2d" style="--x:50%"></i><i class="ring2d" style="--x:66%"></i><i class="ring2d" style="--x:84%"></i><i class="bar2d"></i><i class="finial2d"></i><i class="cord2d cl"></i><i class="cord2d cr"></i></div>
+    <div class="flag2d r" id="flagA"><b class="anc" data-a="barL" style="left:2px;top:28px"></b><b class="anc" data-a="barL2" style="left:2px;top:40px"></b><b class="anc" data-a="barR" style="left:148px;top:28px"></b><b class="anc" data-a="barR2" style="left:148px;top:40px"></b><b class="anc" data-a="fin" style="left:75px;top:4px"></b><b class="anc" data-a="poleTop" style="left:75px;top:14px"></b><b class="anc" data-a="rodMid" style="left:75px;top:28px"></b><b class="anc" data-a="ring1" style="left:24px;top:28px"></b><b class="anc" data-a="ring2" style="left:51px;top:28px"></b><b class="anc" data-a="ring3" style="left:75px;top:28px"></b><b class="anc" data-a="ring4" style="left:99px;top:28px"></b><b class="anc" data-a="ring5" style="left:126px;top:28px"></b><b class="anc" data-a="tip" style="left:75px;top:282px"></b><b class="anc" data-a="poleBot" style="left:75px;top:440px"></b><i class="pole2d"></i><i class="collar"></i><i class="spike"></i><canvas class="cloth" width="268" height="524"></canvas><i class="ring2d" style="--x:16%"></i><i class="ring2d" style="--x:34%"></i><i class="ring2d" style="--x:50%"></i><i class="ring2d" style="--x:66%"></i><i class="ring2d" style="--x:84%"></i><i class="bar2d"></i><i class="finial2d"></i><i class="cord2d cl"></i><i class="cord2d cr"></i></div>
+    <div class="dock"><div class="gbadge E" id="guessBadge"></div><div class="shortlist" id="shortlist" hidden></div></div>
+    <button type="button" class="endturn" id="endturn" data-team="E"><span class="et-ring"></span><span class="et-face"><span class="et-emb"></span><span class="et-label">End turn</span><svg class="et-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <div class="feed" id="feed"></div>
+    <div class="ribbon" id="ribbon"></div>
+    <aside class="sheet" id="tsheet" hidden>
+      <div class="sheet-head"><span class="logo">Menu</span><button type="button" class="x" data-close aria-label="Close">✕</button></div>
+      <div id="shConfirm"></div>
+      <section><h4>Invite</h4><div id="shInvite"></div></section>
+      <section><h4>Players</h4><ul class="plist" id="plist"></ul><div id="shSeat"></div></section>
+      <section><h4>Settings</h4><div class="volrow"><svg class="volicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/></svg><label class="sr-only" for="volSlider">Volume</label><input type="range" id="volSlider" min="0" max="100" step="1"><span class="volval" id="volVal"></span></div>
+        <div class="row2"><button type="button" class="sbtn" data-s="rename">Rename</button></div>
+        <form id="shRename" class="rename" hidden><input id="shName" maxlength="20" aria-label="Your name"><button class="sbtn" type="submit">Save</button></form></section>
+      <section id="shHost" hidden><h4>Host</h4><div class="row2" id="shHostBtns"></div></section>
+      <section><button type="button" class="sbtn leave" data-s="leave">Leave room</button></section>
+    </aside>
+    <div class="victory" id="victory" hidden></div>
+</div></div></main>
 
 <!-- ============ OVERLAYS ============ -->
 <div id="overlay" class="overlay" hidden></div>
@@ -157,6 +171,8 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/fx.js"></script>
+<script src="/table.js"></script>
 <script src="/app.js"></script>
+<script type="module" src="/table-gl.js"></script>
 </body>
 </html>

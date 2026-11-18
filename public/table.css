@@ -1,0 +1,875 @@
+/* Deepnames 3D table (game screen). Generated from the approved preview. */
+#game{
+  --bg:#0a0806; --panel:#1a1410; --line:rgba(231,196,122,.28); --ink:#f6ead0; --ink2:#d8c6a2; --mute:#a3917a;
+  --gold:#e7c47a; --gold2:#b68e4a; --E:#ef5468; --A:#74aef5;
+  --f:"Fondamento","Palatino Linotype",Palatino,Georgia,serif;
+  --tilt:50deg;
+  color-scheme:dark;
+}
+/* ================= frame ================= */
+
+#game .canvas{position:absolute;left:0;top:0;width:1280px;height:820px;transform-origin:0 0;transform:scale(var(--s,1));overflow:hidden;
+  background:radial-gradient(900px 520px at 50% 52%,#3a2a1b,#140e09 72%,#070504);color:var(--ink)}
+#game .canvas::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 180px 50px rgba(0,0,0,.85);z-index:30}
+#game .motes{position:absolute;inset:0;pointer-events:none;z-index:25;opacity:.8;
+  background:radial-gradient(1.6px 1.6px at 15% 80%,#ffcf8a,transparent),radial-gradient(1.2px 1.2px at 60% 90%,#ffb36b,transparent),radial-gradient(1.8px 1.8px at 85% 70%,#ffe2a8,transparent),radial-gradient(1px 1px at 35% 60%,#ffb36b,transparent);
+  background-size:260px 300px;animation:rise 14s linear infinite}
+@keyframes rise{to{background-position:0 -600px}}
+
+/* ================= 3D scene ================= */
+#game .scene{position:absolute;inset:0;perspective:1500px;perspective-origin:50% 8%;z-index:2}
+#game .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97)}
+#game .shake.big{animation:shakebig .9s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{20%,60%{transform:translate(-4px,2px)}40%,80%{transform:translate(4px,-2px)}}
+@keyframes shakebig{10%,90%{transform:translate(-3px,1px)}20%,80%{transform:translate(6px,-2px)}30%,50%,70%{transform:translate(-10px,4px)}40%,60%{transform:translate(10px,-4px)}}
+#game .table{position:absolute;left:150px;top:118px;width:980px;height:640px;transform-style:preserve-3d;transform-origin:50% 60%;
+  transform:rotateX(var(--tilt));transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+#game .top{position:absolute;inset:0;border-radius:34px;transform-style:preserve-3d;
+  background:var(--grain),
+    radial-gradient(ellipse 60% 55% at 50% 52%,rgba(255,190,110,var(--glow,.16)),transparent 70%),
+    repeating-linear-gradient(92deg,rgba(0,0,0,.08) 0 3px,transparent 3px 11px),
+    linear-gradient(180deg,#4a3420,#33241a 50%,#281c13);
+  box-shadow:inset 0 0 0 4px #7a5a2c,inset 0 0 0 10px #22180f,inset 0 0 0 12px rgba(231,196,122,.5),inset 0 0 90px rgba(0,0,0,.6)}
+#game .top::before{content:"";position:absolute;left:50%;top:52%;width:600px;height:600px;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:.32;
+  background:repeating-conic-gradient(from 0deg,rgba(231,196,122,.5) 0 1deg,transparent 1deg 15deg);
+  -webkit-mask-image:radial-gradient(circle,transparent 46%,#000 47%,#000 49%,transparent 50%,transparent 60%,#000 61%,#000 62%,transparent 63%);
+  mask-image:radial-gradient(circle,transparent 46%,#000 47%,#000 49%,transparent 50%,transparent 60%,#000 61%,#000 62%,transparent 63%);animation:runes 120s linear infinite}
+@keyframes runes{to{transform:translate(-50%,-50%) rotate(360deg)}}
+#game .lightpool{position:absolute;inset:0;border-radius:34px;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 40% 38% at var(--lx,30%) var(--ly,40%),rgba(255,170,80,.18),transparent 70%);animation:flick 4s ease-in-out infinite alternate}
+@keyframes flick{0%{--lx:30%;opacity:.8}30%{opacity:1}60%{opacity:.75}100%{opacity:1}}
+#game .edge{position:absolute;left:24px;right:24px;bottom:0;height:46px;transform-origin:50% 0;transform:translateY(100%) rotateX(-90deg) translateY(-46px);
+  transform:rotateX(-90deg);top:100%;
+  background:linear-gradient(180deg,#5a4026,#2a1d12);box-shadow:inset 0 2px 0 rgba(255,220,160,.25);border-radius:0 0 14px 14px}
+
+#game .grid{position:absolute;left:83px;top:118px;width:814px;height:448px;display:grid;grid-template-columns:repeat(5,150px);grid-auto-rows:100px;gap:16px;transform-style:preserve-3d}
+#game .slot{position:relative;transform-style:preserve-3d}
+#game .well{position:absolute;inset:-5px;border-radius:12px;background:rgba(0,0,0,.35);box-shadow:inset 0 3px 8px rgba(0,0,0,.7),0 1px 0 rgba(255,220,160,.12)}
+#game .shadow{position:absolute;inset:4px;border-radius:10px;background:rgba(0,0,0,.6);filter:blur(6px);transform:translateZ(1px);transition:transform .3s,opacity .3s}
+#game .tile{position:absolute;inset:0;border:0;padding:0;background:none;color:inherit;transform-style:preserve-3d;--z:4px;--rx:0deg;
+  transform:translateZ(var(--z)) rotateX(var(--rx));transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+#game .slot:not(.rev):hover .tile{--z:34px;--rx:-10deg}
+#game .slot:not(.rev):hover .shadow{transform:translateZ(1px) translate(6px,10px) scale(1.06);opacity:.5}
+#game .layer{position:absolute;inset:0;border-radius:9px;background:#1d140c}
+#game .layer.l1{transform:translateZ(-2px);background:#6b4e28}
+#game .layer.l2{transform:translateZ(-4px);background:#4a351c}
+#game .face{position:absolute;inset:0;transform:translateZ(0)}
+#game .back{visibility:hidden}
+#game .slot.rev .front{visibility:hidden}
+#game .slot.rev .back{visibility:visible}
+#game .plate{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:7%;border-radius:9px;overflow:hidden;
+  background:var(--grain),linear-gradient(172deg,#5a4e40 0%,#3a3128 50%,#2a231b 100%);border:2px solid var(--gold2);
+  box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(231,196,122,.45),inset 0 2px 0 rgba(255,240,210,.25),inset 0 -6px 14px rgba(0,0,0,.5)}
+#game .plate::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle,#d9b56a 0 2.6px,transparent 3.2px) 6px 6px/12px 12px no-repeat,radial-gradient(circle,#d9b56a 0 2.6px,transparent 3.2px) calc(100% - 6px) 6px/12px 12px no-repeat,
+             radial-gradient(circle,#d9b56a 0 2.6px,transparent 3.2px) 6px calc(100% - 6px)/12px 12px no-repeat,radial-gradient(circle,#d9b56a 0 2.6px,transparent 3.2px) calc(100% - 6px) calc(100% - 6px)/12px 12px no-repeat}
+#game .plate::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,240,200,.3) 50%,transparent 62%) 170% 0/300% 100% no-repeat}
+#game .slot:not(.rev):hover .plate::after{animation:shine .9s ease-out}
+@keyframes shine{to{background-position:-70% 0}}
+#game .word{position:relative;z-index:3;line-height:1.05;color:#fff3d6;text-shadow:0 1px 0 #000,0 2px 2px rgba(0,0,0,.8);text-wrap:balance;font-size:22px}
+#game .glyph{position:absolute;z-index:1;height:78%;width:auto;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.2;color:#fff}
+#game .kg{position:absolute;z-index:2;top:9%;right:8%;width:16%;height:auto;display:none;color:#fff;opacity:.8}
+#game .slot:not(.rev):hover .plate{border-color:#f2d491;box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(242,212,145,.8),0 0 30px rgba(231,196,122,.45)}
+#game .slot[data-role="E"] .back .plate{background:repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 6px),linear-gradient(165deg,#b72a40,#6b1224 70%,#470b16);border-color:#ff8090}
+#game .slot[data-role="A"] .back .plate{background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px),linear-gradient(165deg,#3d77ca,#1f4886 70%,#0f2342);border-color:#9cc5ff}
+#game .slot[data-role="B"] .back .plate{background:var(--grain),linear-gradient(165deg,#9b8e72,#675d49 70%,#3d372b);border-color:#d9c9a2}
+#game .slot[data-role="X"] .back .plate{background:linear-gradient(118deg,transparent 46%,rgba(255,255,255,.14) 47.5%,transparent 49%),radial-gradient(circle at 50% 40%,#1a1714,#000 72%);border-color:#5d554c}
+#game .slot[data-role="X"] .back .glyph{opacity:.5;filter:drop-shadow(0 0 8px rgba(255,40,40,.8))}
+#game .slot.rev .tile{--z:2px}
+#game .spy .slot:not(.rev) .kg{display:block}
+#game .spy .slot:not(.rev)[data-role="E"] .front .plate{background:linear-gradient(170deg,#a62538,#6a1222 60%,#470b16);border-color:#ff8090}
+#game .spy .slot:not(.rev)[data-role="A"] .front .plate{background:linear-gradient(170deg,#2f64b0,#1b3d70 60%,#0f2342);border-color:#9cc5ff}
+#game .spy .slot:not(.rev)[data-role="B"] .front .plate{background:linear-gradient(170deg,#857a63,#5a5243 60%,#3b3529);border-color:#d9c9a2}
+#game .spy .slot:not(.rev)[data-role="X"] .front .plate{background:radial-gradient(circle at 50% 40%,#1a1714,#000 75%);border-color:#8d847a}
+#game .spy .slot.rev .face{filter:brightness(.55) saturate(.7)}
+/* suggestion */
+#game .slot.marked .plate{border-color:#ffe6a6;box-shadow:inset 0 0 0 3px #2a2018,0 0 0 2px #ffe6a6,0 0 30px rgba(231,196,122,.8)}
+#game .slot.marked .tile{--z:18px}
+#game .pin{position:absolute;left:12px;top:-6px;z-index:5;transform-origin:50% 100%;transform:translateZ(22px) rotateX(calc(var(--tilt) * -1));display:flex;align-items:center;gap:5px;
+  background:var(--gold);color:#1b120a;padding:2px 10px 2px 3px;border-radius:999px;font-size:15px;box-shadow:0 3px 8px rgba(0,0,0,.6);pointer-events:none}
+#game .pin i{width:20px;height:20px;border-radius:50%;background:#7a1a2a;color:#fff;font-style:normal;font-size:12px;display:grid;place-items:center}
+#game .slot:not(.marked) .pin{display:none}
+/* reveal + deal */
+#game .slot.flipping .tile{animation:lift .9s cubic-bezier(.3,.7,.3,1) both}
+#game .slot.flipping .front{animation:h1 .9s linear both}
+#game .slot.flipping .back{animation:h2 .9s linear both}
+@keyframes lift{0%{transform:translateZ(13px)}35%{transform:translateZ(120px) rotateX(-14deg) rotateY(0)}50%{transform:translateZ(130px) rotateX(-14deg) rotateY(90deg)}51%{transform:translateZ(130px) rotateX(-14deg) rotateY(-90deg)}
+  80%{transform:translateZ(46px) rotateY(0)}92%{transform:translateZ(10px)}100%{transform:translateZ(13px)}}
+@keyframes h1{0%,49.9%{visibility:visible}50%,100%{visibility:hidden}}
+@keyframes h2{0%,49.9%{visibility:hidden}50%,100%{visibility:visible}}
+#game .slot.flipping .shadow{animation:shad .9s both}
+@keyframes shad{40%,55%{transform:translateZ(1px) translate(20px,40px) scale(1.25);opacity:.25}100%{transform:translateZ(1px);opacity:.6}}
+#game .slot.dealing .tile{animation:deal .9s cubic-bezier(.2,.9,.3,1.08) both;animation-delay:calc(var(--i) * 70ms)}
+#game .slot.dealing .shadow{animation:dealshadow .9s both;animation-delay:calc(var(--i) * 70ms)}
+@keyframes deal{0%{transform:translate3d(var(--dx),var(--dy),420px) rotateZ(var(--rz)) rotateX(30deg);opacity:0}25%{opacity:1}85%{transform:translate3d(0,0,9px)}100%{transform:translateZ(13px)}}
+@keyframes dealshadow{0%{opacity:0;transform:translateZ(1px) scale(.4)}100%{opacity:.6}}
+#game .dust{position:absolute;left:50%;top:50%;width:200px;height:200px;margin:-100px 0 0 -100px;border-radius:50%;pointer-events:none;transform:translateZ(2px) scale(.2);
+  border:4px solid var(--dc,rgba(255,220,160,.8));box-shadow:0 0 30px var(--dc,rgba(255,220,160,.6)),inset 0 0 30px var(--dc,rgba(255,220,160,.4));animation:dust .8s ease-out forwards}
+@keyframes dust{to{transform:translateZ(2px) scale(1.6);opacity:0}}
+#game .slot.flash .back .plate{animation:flash 1.1s ease-out}
+@keyframes flash{0%{filter:brightness(2.4) saturate(1.4)}100%{filter:none}}
+
+/* ================= standing pieces (billboards) ================= */
+#game .stand{position:absolute;transform-origin:50% 100%;transform:rotateX(calc(var(--tilt) * -1));transform-style:preserve-3d}
+#game .tablet{position:absolute;z-index:15;left:50%;top:96px;transform:translateX(-50%);width:440px;height:132px;padding:14px 20px;text-align:center;border-radius:16px 16px 6px 6px;
+  background:var(--grain),linear-gradient(180deg,#6a5d4c,#463b2f 60%,#352c22);border:3px solid #8a6a38;
+  box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(231,196,122,.4),0 18px 30px rgba(0,0,0,.6)}
+#game .tablet .who{font-size:18px;color:#ffb3bd;display:flex;justify-content:center;align-items:center;gap:8px}
+#game .tablet .who svg{width:22px;height:22px}
+#game .tablet .clue{font-size:58px;line-height:1;color:#fff3d6;text-shadow:0 2px 0 #000,0 -1px 0 rgba(255,255,255,.12);margin:4px 0}
+#game .tablet .clue span{color:var(--E);margin-left:14px;text-shadow:0 0 18px var(--E)}
+#game .tablet .orbs{display:flex;justify-content:center;gap:8px;align-items:center;font-size:15px;color:var(--ink2)}
+#game .orb{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,var(--E) 40%,#5a0f1c 100%);box-shadow:0 0 10px var(--E)}
+#game .orb.used{background:#2a221b;box-shadow:inset 0 0 0 1px rgba(239,84,104,.5)}
+#game .tablet.slam{animation:tabletslam .7s cubic-bezier(.2,1.3,.3,1)}
+@keyframes tabletslam{0%{transform:translateX(-50%) translateY(-90px) scale(1.2);opacity:0;filter:blur(6px)}60%{filter:none}100%{transform:translateX(-50%)}}
+
+#game .banner{width:96px;height:220px;padding:16px 8px 40px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;
+  clip-path:polygon(0 0,100% 0,100% 84%,50% 100%,0 84%);
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 7px),linear-gradient(180deg,color-mix(in srgb,var(--tc) 72%,#000),color-mix(in srgb,var(--tc) 32%,#000));
+  animation:sway 5s ease-in-out infinite alternate;transform-origin:50% 0}
+#game .banner-wrap{width:96px;height:250px;top:190px}
+#game .banner-wrap.l{left:-6px}#game .banner-wrap.r{right:-6px}
+#game .banner-wrap .pole{position:absolute;left:-6px;right:-6px;top:0;height:12px;border-radius:6px;background:linear-gradient(180deg,#f1d38f,#8a6428)}
+#game .banner-wrap .post{position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:linear-gradient(90deg,#8a6428,#f1d38f,#8a6428)}
+#game .banner-wrap .banner{position:absolute;top:10px;left:0}
+@keyframes sway{from{transform:skewY(1.5deg)}to{transform:skewY(-1.5deg)}}
+#game .E{--tc:var(--E)}#game .A{--tc:var(--A)}
+#game .banner svg{width:46px;height:46px;color:#fff3d6;filter:drop-shadow(0 0 8px var(--tc))}
+#game .banner b{font-weight:400;font-size:44px;line-height:1;color:#fff;text-shadow:0 0 16px var(--tc),0 2px 0 #000}
+#game .banner small{font-size:13px;color:#fff3d6;line-height:1.1}
+#game .gems{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;width:72px}
+#game .gem{width:12px;height:12px;transform:rotate(45deg);border-radius:2px;background:linear-gradient(135deg,#fff 0%,var(--tc) 35%,color-mix(in srgb,var(--tc) 50%,#000) 100%);box-shadow:0 0 8px var(--tc);transition:all .5s}
+#game .gem.gone{background:#2a221b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+#game .gem.pop{animation:gempop .8s ease-out}
+@keyframes gempop{0%{transform:rotate(45deg) scale(2.2);filter:brightness(3)}100%{transform:rotate(45deg) scale(1)}}
+
+/* ================= 2D HUD ================= */
+#game .hud{position:absolute;z-index:20}
+#game .hero{display:flex;align-items:center;gap:12px}
+#game .portrait{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;position:relative;flex:none;
+  background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--tc) 60%,#fff),var(--tc) 40%,color-mix(in srgb,var(--tc) 30%,#000));
+  box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 0 0 8px #120d09,0 0 34px -4px var(--tc)}
+#game .portrait svg{width:50px;height:50px;color:#fff}
+#game .portrait.active{animation:herop 2.2s ease-in-out infinite}
+@keyframes herop{50%{box-shadow:0 0 0 3px #120d09,0 0 0 6px #f2d491,0 0 0 8px #120d09,0 0 54px 4px var(--tc)}}
+#game .hinfo{display:flex;flex-direction:column;gap:4px}
+#game .hinfo .n{font-size:30px;line-height:1;color:var(--tc);text-shadow:0 2px 0 #000}
+#game .crew{display:flex;gap:6px}
+#game .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:15px;color:#fff3d6;position:relative;
+  background:radial-gradient(circle at 35% 30%,#54473a,#1d1712);border:2px solid var(--tc);box-shadow:0 0 0 2px #120d09}
+#game .av .crn{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:16px;height:11px;color:var(--gold)}
+#game .av.talk::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--tc);animation:ping 1.4s ease-out infinite}
+@keyframes ping{to{inset:-12px;opacity:0}}
+#game .av.off{filter:grayscale(1) brightness(.6)}
+#game .hud.me{left:26px;bottom:22px}
+#game .hud.them{right:26px;top:20px;flex-direction:row-reverse}
+#game .hud.them .hinfo{align-items:flex-end}
+#game .hud.room{left:26px;top:22px;font-size:17px;color:var(--ink2)}
+#game .hud.room b{font-weight:400;color:var(--gold);letter-spacing:.16em;margin-left:6px}
+#game .hud.room .logo{display:block;font-size:30px;color:var(--gold);text-shadow:0 2px 0 #000;letter-spacing:.02em}
+#game .endturn{position:absolute;z-index:20;right:28px;top:50%;transform:translateY(-50%);width:132px;height:72px;border-radius:40px;border:0;
+  background:var(--grain),radial-gradient(ellipse at 50% 30%,#f6dc9f,#c8954a 60%,#8a6428);color:#2a1a0c;font-size:22px;
+  box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 8px 0 #5a3d16,0 14px 24px rgba(0,0,0,.6);transition:transform .15s}
+#game .endturn:hover{transform:translateY(-50%) scale(1.05);box-shadow:0 0 0 3px #120d09,0 0 0 6px #f2d491,0 8px 0 #5a3d16,0 0 40px rgba(255,210,140,.6)}
+#game .endturn:active{transform:translateY(calc(-50% + 4px));box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 4px 0 #5a3d16}
+#game .feed{position:absolute;z-index:20;right:28px;bottom:24px;width:260px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.3}
+#game .feed div{padding:6px 12px;border-radius:8px;background:rgba(20,15,11,.82);border-left:3px solid var(--tc,var(--gold2));animation:feedin .5s ease-out both}
+#game .feed b{font-weight:400;color:var(--gold)}
+@keyframes feedin{from{opacity:0;transform:translateX(20px)}}
+#game .ribbon{position:absolute;z-index:22;left:0;right:0;top:44%;display:flex;justify-content:center;align-items:center;gap:16px;padding:16px;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--tc) 32%,rgba(10,6,4,.9)) 20%,color-mix(in srgb,var(--tc) 32%,rgba(10,6,4,.9)) 80%,transparent);
+  border-block:1px solid color-mix(in srgb,var(--tc) 70%,transparent)}
+#game .ribbon.show{animation:ribbon 2s cubic-bezier(.2,.8,.2,1)}
+#game .ribbon svg{width:48px;height:48px;color:var(--tc)}
+#game .ribbon span{font-size:56px;line-height:1;color:#fff;text-shadow:0 3px 0 #000,0 0 30px var(--tc)}
+@keyframes ribbon{0%{opacity:0;transform:scaleY(0)}12%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+
+@media (prefers-reduced-motion:reduce){
+  #game .motes, #game .top::before, #game .lightpool, #game .banner, #game .flame, #game .portrait.active, #game .av.talk::after, #game .sandtop, #game .sandbot, #game .stream{animation:none!important}
+  #game .table{transition:none}
+}
+
+/* ===== 3D cloth banners ===== */
+#game .flag{width:130px;height:360px;top:110px;transform-style:preserve-3d}
+#game .flag.l{left:-34px;transform:rotateX(calc(var(--tilt) * -1)) rotateY(24deg)}
+#game .flag.r{right:-34px;transform:rotateX(calc(var(--tilt) * -1)) rotateY(-24deg)}
+#game .flag .pole{position:absolute;left:58px;top:6px;bottom:0;width:10px;border-radius:5px;background:linear-gradient(90deg,#5a3d16,#f1d38f 40%,#b68e4a 60%,#5a3d16);box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+#game .flag .finial{position:absolute;left:52px;top:-8px;width:22px;height:22px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff3cf,#e7c47a 40%,#8a6428);box-shadow:0 0 12px rgba(255,210,140,.6)}
+#game .flag .bar{position:absolute;left:4px;right:4px;top:24px;height:9px;border-radius:5px;background:linear-gradient(180deg,#f1d38f,#8a6428);box-shadow:0 3px 6px rgba(0,0,0,.6)}
+#game .flag .bar::before, #game .flag .bar::after{content:"";position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3cf,#b68e4a)}
+#game .flag .bar::before{left:-6px}#game .flag .bar::after{right:-6px}
+#game .flag .foot{position:absolute;left:38px;bottom:-6px;width:50px;height:14px;border-radius:50%;background:radial-gradient(ellipse,#8a6428,#3a2a14 70%);box-shadow:0 6px 12px rgba(0,0,0,.6)}
+#game .cloth{position:absolute;left:10px;top:30px;width:110px;height:250px;transform-style:preserve-3d;transform-origin:50% 0;animation:billow 7s ease-in-out infinite alternate}
+@keyframes billow{from{transform:rotateX(0deg)}to{transform:rotateX(6deg) translateZ(4px)}}
+#game .strip{position:absolute;top:0;height:100%;overflow:hidden;transform-origin:50% 0;animation:wave 4.2s ease-in-out infinite;animation-delay:calc(var(--k) * -.38s)}
+@keyframes wave{0%,100%{transform:translateZ(0) rotateY(0)}25%{transform:translateZ(5px) rotateY(-8deg)}75%{transform:translateZ(-5px) rotateY(8deg)}}
+#game .strip::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,0) 45%,rgba(255,240,210,.12));animation:shade 4.2s ease-in-out infinite;animation-delay:calc(var(--k) * -.38s)}
+@keyframes shade{0%,100%{opacity:.25}25%{opacity:1}75%{opacity:.05}}
+#game .art{position:absolute;top:0;width:110px;height:250px;padding:18px 8px 54px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;
+  clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%);
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.12) 0 2px,transparent 2px 6px),
+    linear-gradient(180deg,color-mix(in srgb,var(--tc) 78%,#000),color-mix(in srgb,var(--tc) 40%,#000) 75%,color-mix(in srgb,var(--tc) 25%,#000))}
+#game .art::before{content:"";position:absolute;inset:5px 5px 0;clip-path:polygon(0 0,100% 0,100% 81.4%,50% 99%,0 81.4%);
+  background:linear-gradient(transparent,transparent) padding-box;border:2px solid rgba(241,211,143,.85);pointer-events:none}
+#game .art .em{width:56px;height:56px;color:#fff3d6;filter:drop-shadow(0 0 8px var(--tc)) drop-shadow(0 2px 0 #000);object-fit:contain}
+#game .art b{font-weight:400;font-size:46px;line-height:1;color:#fff;text-shadow:0 0 16px var(--tc),0 2px 0 #000}
+#game .art small{font-size:14px;color:#fff3d6;line-height:1.1}
+#game .seals{display:grid;grid-template-columns:repeat(4,18px);gap:6px;justify-content:center;margin-top:4px}
+#game .seal{position:relative;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,color-mix(in srgb,var(--tc) 45%,#fff) 0,var(--tc) 38%,color-mix(in srgb,var(--tc) 35%,#000) 78%);
+  box-shadow:0 0 0 2px #d9b56a,0 0 0 3px #3a2a14,0 2px 4px rgba(0,0,0,.7),0 0 10px color-mix(in srgb,var(--tc) 70%,transparent)}
+#game .seal::after{content:"";position:absolute;inset:4px;border-radius:50%;border:1px solid rgba(255,255,255,.45)}
+#game .seal.gone{background:radial-gradient(circle,#0f0a07,#2a2018);box-shadow:0 0 0 2px #6b5130,0 0 0 3px #1a120a,inset 0 2px 4px #000}
+#game .seal.gone::after{inset:0;border:0;border-radius:50%;background:linear-gradient(135deg,transparent 46%,rgba(217,181,106,.5) 48%,transparent 52%),linear-gradient(45deg,transparent 56%,rgba(217,181,106,.35) 58%,transparent 61%)}
+#game .seal.crack{animation:crack .9s ease-out}
+@keyframes crack{0%{transform:scale(1.9);filter:brightness(3)}40%{transform:scale(.8)}100%{transform:scale(1);filter:none}}
+
+/* ===== candles for guesses, fuse for the timer ===== */
+#game .candles{display:flex;justify-content:center;align-items:flex-end;gap:16px;height:42px;margin-top:2px}
+#game .candle{position:relative;width:11px;height:22px;border-radius:2px 2px 3px 3px;background:linear-gradient(90deg,#cdbb8f,#fff6dc 45%,#bfa979);box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+#game .candle::before{content:"";position:absolute;left:50%;top:-4px;width:2px;height:5px;margin-left:-1px;background:#2a1a0c;border-radius:1px}
+#game .candle::after{content:"";position:absolute;left:-6px;right:-6px;bottom:-4px;height:6px;border-radius:50%;background:linear-gradient(180deg,#f1d38f,#8a6428);box-shadow:0 0 8px color-mix(in srgb,var(--tc) 60%,transparent)}
+#game .candle .fl{position:absolute;left:50%;bottom:100%;width:11px;height:18px;margin:0 0 2px -5.5px;border-radius:50% 50% 45% 45%/62% 62% 38% 38%;transform-origin:50% 100%;
+  background:radial-gradient(circle at 50% 72%,#fff 0,#ffe8a0 26%,#ffa53a 55%,rgba(255,90,0,0) 74%);filter:drop-shadow(0 0 7px #ffb347);animation:candle .22s ease-in-out infinite alternate}
+@keyframes candle{from{transform:scale(1,1) rotate(-2deg)}to{transform:scale(.9,1.12) rotate(2deg)}}
+#game .candle.out{height:15px;background:linear-gradient(90deg,#8f805f,#b9a77f 45%,#7d6e50)}
+#game .candle.out .fl{display:none}
+#game .candle .sm{position:absolute;left:50%;bottom:100%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:rgba(200,190,170,.6);filter:blur(2px);animation:smoke 1.6s ease-out forwards}
+@keyframes smoke{to{transform:translate(6px,-40px) scale(3);opacity:0}}
+#game .candles .left{font-size:15px;color:var(--ink2);margin-left:4px;align-self:center}
+#game .fuse{position:relative;height:5px;margin:4px 10px 0;border-radius:3px;background:repeating-linear-gradient(90deg,#4a3820 0 4px,#3a2a16 4px 8px)}
+#game .fuse i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#c87a2a,#ffb347);transform-origin:left;animation:burn 75s linear forwards;width:100%}
+#game .fuse i::after{content:"";position:absolute;right:-5px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:radial-gradient(circle,#fff,#ffcf6a 40%,rgba(255,120,0,0) 70%);box-shadow:0 0 12px #ffb347;animation:spark .15s infinite alternate}
+@keyframes burn{to{transform:scaleX(0)}}
+@keyframes spark{to{transform:scale(1.4)}}
+#game .tablet{height:auto!important;top:84px!important;width:470px!important;padding:8px 18px 10px!important}
+#game .tablet .who{font-size:16px!important}
+#game .tablet .row{display:flex;align-items:center;justify-content:center;gap:22px}
+#game .tablet .clue{font-size:48px!important;margin:0!important}
+#game .tablet .candles{margin:0;height:38px}
+#game .endturn{top:auto!important;bottom:90px!important;transform:none!important;width:124px!important;height:64px!important;font-size:21px!important}
+#game .endturn:hover{transform:scale(1.05)!important}
+#game .endturn:active{transform:translateY(4px)!important}
+
+/* ===== compact feed ===== */
+#game .feed{right:18px!important;bottom:10px!important;width:236px!important;gap:3px!important;font-size:13px!important}
+#game .feed div{padding:3px 10px!important;border-radius:6px!important;background:rgba(20,15,11,.78)!important;transition:opacity .6s,transform .6s}
+#game .feed div.fade{opacity:0;transform:translateX(16px)}
+#game .emblem-note{position:absolute;z-index:21;left:50%;bottom:10px;transform:translateX(-50%);font-size:13px;color:var(--mute);background:rgba(20,15,11,.7);padding:2px 12px;border-radius:999px;border:1px dashed rgba(231,196,122,.4)}
+@media (prefers-reduced-motion:reduce){#game .cloth, #game .strip, #game .strip::after, #game .candle .fl, #game .fuse i, #game .fuse i::after{animation:none!important}}
+
+/* ===== canvas cloth banners (replace the strip version) ===== */
+#game canvas.cloth{position:absolute;left:-2px;top:28px;width:134px;height:262px;animation:none;transform:translateZ(9px)}
+/* ===== logo images ===== */
+#game .glyph{image-rendering:auto}
+#game img.glyph{height:72%;width:auto;opacity:.26;filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+#game img.kg{width:20%;height:auto;top:8%;right:7%;opacity:.95;filter:drop-shadow(0 1px 1px #000)}
+#game .portrait img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 2px 0 rgba(0,0,0,.5))}
+#game .tablet .who img{width:22px;height:22px;object-fit:contain}
+#game .ribbon img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 10px var(--tc))}
+/* ===== fuse around the table rim ===== */
+#game .rimfuse{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;transform:translateZ(3px)}
+#game .rimfuse path{fill:none}
+#game .rope-char{fill:none;stroke:#140d07;stroke-width:9;stroke-linecap:round;stroke-dasharray:3 4;opacity:.85}
+#game .rope-base{fill:none;stroke:#7a4c1c;stroke-width:10;stroke-linecap:round;filter:drop-shadow(0 3px 2px rgba(0,0,0,.75))}
+#game .rope-braid{fill:none;stroke:#e8b46a;stroke-width:4;stroke-dasharray:7 6;stroke-linecap:round}
+#game .rope-braid.b2{stroke:#b07a3a;stroke-dashoffset:6.5}
+#game .sp-glow{fill:rgba(255,170,60,.45);filter:blur(4px)}
+#game .sp-core{fill:#fff6d0;filter:drop-shadow(0 0 6px #ffb347) drop-shadow(0 0 12px #ff7a1a)}
+#game #spark{animation:sparkle .12s linear infinite alternate}
+@keyframes sparkle{to{opacity:.75}}
+#game .rimfuse.hurry .sp-glow{fill:rgba(255,90,40,.7)}
+#game .rimfuse.off{display:none}
+#game .top.hurry{box-shadow:inset 0 0 0 4px #b8402a,inset 0 0 0 10px #22180f,inset 0 0 0 12px rgba(255,120,80,.6),inset 0 0 90px rgba(120,0,0,.5)}
+#game .fuse{display:none}
+
+/* ===== the fuse: twisted rope on the table, a live flame standing at the burning end ===== */
+#game .rimfuse{visibility:hidden}
+#game .ropecv{position:absolute;left:0;top:0;width:980px;height:640px;pointer-events:none;transform:translateZ(3px)}
+#game .ropecv.off, #game .fuseflame.off{display:none}
+#game .fuseflame{left:0;top:0;width:0;height:0;pointer-events:none;transform:translate(var(--fx,490px),var(--fy,36px)) translateZ(6px) rotateX(calc(var(--tilt) * -1)) scale(1.45)}
+#game .fuseflame i, #game .fuseflame b, #game .fuseflame u{position:absolute;display:block;left:0;bottom:0}
+#game .fglow{width:90px;height:90px;margin:0 0 -45px -45px;border-radius:50%;background:radial-gradient(circle,rgba(255,170,60,.55),rgba(255,110,20,.18) 45%,transparent 70%);animation:fglow .18s ease-in-out infinite alternate}
+@keyframes fglow{to{transform:scale(1.15);opacity:.8}}
+#game .f1, #game .f2, #game .f3{border-radius:50% 50% 45% 45%/65% 65% 35% 35%;transform-origin:50% 100%}
+#game .f1{width:24px;height:40px;margin-left:-12px;margin-bottom:-4px;background:radial-gradient(ellipse at 50% 80%,#ff9d2e 0,#ff6a13 45%,rgba(220,40,0,.85) 70%,rgba(200,30,0,0) 78%);filter:blur(.6px);animation:f1 .16s ease-in-out infinite alternate}
+#game .f2{width:15px;height:27px;margin-left:-7.5px;margin-bottom:-3px;background:radial-gradient(ellipse at 50% 82%,#fff3a8 0,#ffd04a 45%,rgba(255,150,30,0) 78%);animation:f2 .12s ease-in-out infinite alternate}
+#game .f3{width:7px;height:12px;margin-left:-3.5px;margin-bottom:-2px;background:radial-gradient(ellipse at 50% 85%,#fff,#fff8d8 50%,rgba(255,240,180,0) 80%);animation:f2 .1s ease-in-out infinite alternate-reverse}
+@keyframes f1{0%{transform:scale(1,1) skewX(-4deg)}50%{transform:scale(.92,1.12) skewX(3deg)}100%{transform:scale(1.04,.94) skewX(-2deg)}}
+@keyframes f2{0%{transform:scale(1,1) translateX(-1px)}100%{transform:scale(.9,1.14) translateX(1px)}}
+#game .sp{width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:#ffe9a0;box-shadow:0 0 6px #ffb347,0 0 2px #fff;opacity:0;animation:spark 1s ease-out infinite;animation-delay:var(--d)}
+@keyframes spark{0%{opacity:1;transform:translate(0,-6px)}100%{opacity:0;transform:translate(var(--x),-46px) scale(.4)}}
+#game .sm{width:12px;height:12px;margin-left:-6px;border-radius:50%;background:rgba(120,110,100,.35);filter:blur(3px);opacity:0;animation:fsmoke 2.7s ease-out infinite;animation-delay:var(--d)}
+@keyframes fsmoke{0%{opacity:.6;transform:translate(0,-30px) scale(.6)}100%{opacity:0;transform:translate(12px,-90px) scale(2.6)}}
+#game .fuseflame.hurry .f1{animation-duration:.09s;filter:blur(.6px) brightness(1.15)}
+#game .fuseflame.hurry .fglow{background:radial-gradient(circle,rgba(255,120,40,.75),rgba(255,60,10,.25) 45%,transparent 70%)}
+#game .fuseflame.hurry .sp{animation-duration:.6s}
+@media (prefers-reduced-motion:reduce){#game .fuseflame *{animation:none!important}}
+
+/* ===== menu button + side sheet ===== */
+#game .hud.room{display:flex;align-items:center;gap:12px}
+#game .menubtn{width:50px;height:50px;border-radius:12px;display:grid;place-items:center;border:0;color:#2a1a0c;cursor:pointer;
+  background:var(--grain),radial-gradient(ellipse at 50% 30%,#f6dc9f,#c8954a 60%,#8a6428);box-shadow:0 0 0 2px #120d09,0 0 0 4px var(--gold2),0 5px 0 #5a3d16,0 8px 16px rgba(0,0,0,.6)}
+#game .menubtn svg{width:24px;height:24px}
+#game .menubtn:hover{filter:brightness(1.08)}
+#game .menubtn:active{transform:translateY(3px);box-shadow:0 0 0 2px #120d09,0 0 0 4px var(--gold2),0 2px 0 #5a3d16}
+#game .sheet{position:absolute;z-index:40;left:0;top:0;bottom:0;width:360px;padding:22px;display:flex;flex-direction:column;gap:16px;overflow:hidden;
+  background:var(--grain),linear-gradient(180deg,#2a2018,#17110c);border-right:2px solid var(--gold2);box-shadow:20px 0 60px rgba(0,0,0,.7);animation:sheetin .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheetin{from{transform:translateX(-100%)}}
+#game .sheet[hidden]{display:none}
+#game .sheet-head{display:flex;justify-content:space-between;align-items:center}
+#game .sheet .logo{font-size:34px;color:var(--gold);text-shadow:0 2px 0 #000}
+#game .sheet .x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--ink);font-size:18px;cursor:pointer}
+#game .sheet h4{margin:0 0 8px;font-weight:400;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+#game .sheet section{padding-top:12px;border-top:1px solid var(--line)}
+#game .invite{display:flex;gap:14px;align-items:center}
+#game .invite .qr{width:84px;height:84px;flex:none;border-radius:8px;background:repeating-conic-gradient(#1b120a 0 25%,#efe0b8 0 50%) 0 0/12px 12px;box-shadow:0 0 0 4px #efe0b8}
+#game .invite .code{display:block;font-size:30px;letter-spacing:.14em;color:var(--gold);line-height:1}
+#game .invite .link{display:block;font-size:13px;color:var(--ink2);margin:4px 0 6px}
+#game .sbtn{padding:6px 14px;border-radius:8px;border:1px solid var(--gold2);background:linear-gradient(180deg,#3a2e22,#211913);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+#game .sbtn:hover{border-color:#f2d491}
+#game .sbtn.danger{border-color:#c4485a;color:#ffc2cb}
+#game .sbtn.leave{width:100%}
+#game .row2{display:flex;flex-wrap:wrap;gap:8px}
+#game .plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:17px}
+#game .plist li{display:flex;align-items:center;gap:10px}
+#game .plist small{margin-left:auto;font-size:13px;color:var(--mute)}
+#game .canvas:not(.ishost) .hostonly{display:none}
+
+/* ===== victory ===== */
+#game .victory{position:absolute;inset:0;z-index:35;display:grid;place-items:center;--vc:var(--E);
+  background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--vc) 32%,rgba(0,0,0,.35)),rgba(6,4,3,.86) 66%);animation:vfade .6s ease-out}
+#game .victory[hidden]{display:none}
+#game .victory.A{--vc:var(--A)} #game .victory.X{--vc:#000;background:radial-gradient(circle at 50% 42%,rgba(40,34,30,.85),rgba(0,0,0,.94) 64%)}
+@keyframes vfade{from{opacity:0}}
+#game .vrays{position:absolute;left:50%;top:40%;width:1800px;height:1800px;margin:-900px 0 0 -900px;pointer-events:none;opacity:.55;
+  background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--vc) 50%,transparent) 0deg 5deg,transparent 5deg 16deg);
+  -webkit-mask-image:radial-gradient(circle,#000 0,transparent 42%);mask-image:radial-gradient(circle,#000 0,transparent 42%);animation:vrays 40s linear infinite}
+#game .victory.X .vrays{background:repeating-conic-gradient(from 0deg,rgba(255,30,30,.25) 0deg 2deg,transparent 2deg 14deg);animation-duration:90s}
+@keyframes vrays{to{transform:rotate(360deg)}}
+#game .vcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;width:640px}
+#game .vbanner{position:relative;width:190px;height:250px;margin-top:-30px;clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%);display:grid;place-items:start center;padding-top:34px;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.12) 0 2px,transparent 2px 6px),linear-gradient(180deg,color-mix(in srgb,var(--vc) 80%,#000),color-mix(in srgb,var(--vc) 35%,#000));
+  transform-origin:50% 0;animation:vdrop 1s cubic-bezier(.2,1.3,.3,1) both,vsway 5s 1s ease-in-out infinite alternate;filter:drop-shadow(0 20px 30px rgba(0,0,0,.7))}
+#game .vbanner::before{content:"";position:absolute;inset:7px 7px 0;clip-path:polygon(0 0,100% 0,100% 81%,50% 98.6%,0 81%);border:3px solid rgba(241,211,143,.9)}
+#game .vbanner img, #game .vbanner svg{width:120px;height:120px;object-fit:contain;color:#e8e2d8;filter:drop-shadow(0 0 18px var(--vc)) drop-shadow(0 3px 0 #000)}
+#game .victory.X .vbanner{background:linear-gradient(118deg,transparent 46%,rgba(255,255,255,.12) 47.5%,transparent 49%),radial-gradient(circle at 50% 40%,#1a1714,#000 72%)}
+#game .victory.X .vbanner svg{filter:drop-shadow(0 0 16px rgba(255,40,40,.8))}
+#game .vrod{position:absolute;top:-36px;left:50%;width:240px;height:14px;margin-left:-120px;border-radius:7px;background:linear-gradient(180deg,#f1d38f,#8a6428);box-shadow:0 4px 8px rgba(0,0,0,.6);animation:vdrop 1s cubic-bezier(.2,1.3,.3,1) both}
+@keyframes vdrop{from{transform:translateY(-420px)}}
+@keyframes vsway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
+#game .vtitle{margin:0;font-weight:400;font-size:76px;line-height:1;color:#fff;text-shadow:0 4px 0 #000,0 0 40px var(--vc);animation:vtitle 1.4s .4s cubic-bezier(.2,.8,.2,1) both}
+#game .victory.X .vtitle{font-size:64px;text-shadow:0 4px 0 #000,0 0 30px rgba(255,50,50,.5);animation:vtitle 1.4s .4s both,vflicker 3.5s 2s steps(1) infinite}
+@keyframes vtitle{from{opacity:0;letter-spacing:.4em;filter:blur(8px)}}
+@keyframes vflicker{0%,100%{opacity:1}3%{opacity:.35}5%{opacity:1}41%{opacity:.6}43%{opacity:1}}
+#game .vsub{margin:0;font-size:22px;color:var(--ink);animation:vup .6s .9s both}
+#game .vstats{display:flex;gap:12px;animation:vup .6s 1.1s both}
+#game .vstats div{padding:8px 16px;border-radius:10px;background:rgba(20,15,11,.8);border:1px solid var(--line);min-width:130px}
+#game .vstats b{display:block;font-weight:400;font-size:30px;color:var(--gold);line-height:1.1}
+#game .vstats span{font-size:14px;color:var(--ink2)}
+#game .vactions{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px;animation:vup .6s 1.3s both}
+#game .vactions .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+@keyframes vup{from{opacity:0;transform:translateY(16px)}}
+#game .bigbtn{padding:12px 26px;border-radius:40px;border:0;font:inherit;font-size:22px;color:#2a1a0c;cursor:pointer;
+  background:var(--grain),radial-gradient(ellipse at 50% 30%,#f6dc9f,#c8954a 60%,#8a6428);box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 7px 0 #5a3d16,0 12px 22px rgba(0,0,0,.6)}
+#game .bigbtn:hover{filter:brightness(1.08)}
+#game .bigbtn:active{transform:translateY(4px);box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 3px 0 #5a3d16}
+#game .bigbtn.stone{color:var(--ink);background:var(--grain),linear-gradient(180deg,#5a4e40,#2e261e);box-shadow:0 0 0 3px #120d09,0 0 0 5px #7a6040,0 6px 0 #1a120b,0 10px 18px rgba(0,0,0,.6)}
+#game .bigbtn.ready{animation:readyglow 2s ease-in-out infinite}
+@keyframes readyglow{50%{box-shadow:0 0 0 3px #120d09,0 0 0 6px #f2d491,0 7px 0 #5a3d16,0 0 40px rgba(255,210,140,.7)}}
+#game .vwait{display:flex;align-items:center;gap:12px;font-size:20px;color:var(--ink2)}
+#game .vwait i{width:22px;height:22px;border-radius:50%;border:3px solid rgba(231,196,122,.25);border-top-color:var(--gold);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#game .vlink{background:none;border:0;color:var(--ink2);font:inherit;font-size:16px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+#game .vember{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:var(--ec);box-shadow:0 0 8px var(--ec);pointer-events:none;animation:vember var(--dur) linear forwards}
+@keyframes vember{to{transform:translate(var(--dx),-900px);opacity:0}}
+
+/* ===== upright 3D flagpoles ===== */
+/* Stand much more upright than a flat cut-out (62° up from the table), hinged at the base. */
+#game .flag.l{transform:rotateX(calc(-1 * (var(--tilt) + 26deg))) rotateY(22deg)!important}
+#game .flag.r{transform:rotateX(calc(-1 * (var(--tilt) + 26deg))) rotateY(-22deg)!important}
+#game .flag{transform-style:preserve-3d}
+#game .pole3d{position:absolute;left:63px;top:6px;bottom:0;width:0;transform-style:preserve-3d}
+#game .pole3d i{position:absolute;top:0;bottom:0;left:-2.2px;width:4.4px;transform:rotateY(var(--a)) translateZ(5.2px);
+  background:linear-gradient(180deg,#fff0c4,#e7c47a 12%,#b68e4a 60%,#7a5a22);filter:brightness(var(--sh));backface-visibility:hidden}
+#game .pole3d::after{content:"";position:absolute;left:-8px;bottom:-2px;width:16px;height:10px;border-radius:50%;background:radial-gradient(ellipse,#e7c47a,#6b4a1c);transform:rotateX(90deg)}
+#game .flag .finial{left:53px!important;top:-12px!important;width:20px!important;height:20px!important;border-radius:50%!important;transform:translateZ(1px)}
+#game .flagbase{position:absolute;top:442px;width:64px;height:64px;border-radius:50%;transform:translateZ(1px);
+  background:radial-gradient(circle at 50% 50%,#5a3d16 0 7px,#e7c47a 8px 10px,#8a6428 11px 22px,#f1d38f 23px 24px,#6b4a1c 25px 30px,transparent 31px);
+  box-shadow:0 10px 18px rgba(0,0,0,.65)}
+#game .flagbase::after{content:"";position:absolute;left:50%;top:50%;width:90px;height:40px;margin:-6px 0 0 -30px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%);transform:translateZ(-.5px);z-index:-1}
+#game .flagbase.l{left:-3px}
+#game .flagbase.r{right:-3px}
+
+#game .flag .bar{transform:translateZ(9px)}
+#game .flag .finial{transform:translateZ(0)!important}
+
+/* ===== flags v3: standing truly upright on the table, every part round ===== */
+#game .flag{top:34px!important}
+#game .flag.l{transform:rotateX(-90deg) rotateY(26deg)!important}
+#game .flag.r{transform:rotateX(-90deg) rotateY(-26deg)!important}
+#game .pole3d i{background:linear-gradient(180deg,#fff0c4,#e7c47a 10%,#c49a52 55%,#8a6428)!important}
+/* finial: a gold ball made from four crossing discs */
+#game .flag .finial{background:none!important;box-shadow:none!important;transform-style:preserve-3d;transform:translateZ(0)!important;left:52px!important;top:-14px!important;width:22px!important;height:22px!important}
+#game .flag .finial i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff6d6,#e7c47a 38%,#a57a35 70%,#6b4a1c);transform:rotateY(calc(var(--n) * 45deg))}
+#game .flag .finial i:nth-child(1){--n:0}#game .flag .finial i:nth-child(2){--n:1}#game .flag .finial i:nth-child(3){--n:2}#game .flag .finial i:nth-child(4){--n:3}
+/* crossbar: a round rod made of eight shaded faces */
+#game .flag .bar{background:none!important;box-shadow:none!important;height:0!important;top:28px!important;transform-style:preserve-3d;transform:translateZ(9px)}
+#game .flag .bar i{position:absolute;left:0;right:0;top:-1.9px;height:3.8px;transform:rotateX(var(--a)) translateZ(4.6px);background:linear-gradient(90deg,#8a6428,#f1d38f 20%,#e7c47a 50%,#f1d38f 80%,#8a6428);filter:brightness(var(--sh));backface-visibility:hidden}
+#game .flag .bar::before, #game .flag .bar::after{top:-7px!important;width:14px!important;height:14px!important;transform:translateZ(0)}
+/* base: a thick round gold plinth lying on the table */
+#game .flagbase{top:376px!important;width:60px!important;height:60px!important;background:none!important;box-shadow:none!important;transform:translateZ(0)!important;transform-style:preserve-3d}
+#game .flagbase.l{left:-1px!important}#game .flagbase.r{right:-1px!important}
+#game .flagbase::after{width:110px!important;height:60px!important;margin:-14px 0 0 -55px!important;left:50%!important;top:50%!important;transform:translateZ(.5px)!important}
+#game .disc{position:absolute;inset:0;transform-style:preserve-3d}
+#game .disc .bottom{position:absolute;inset:0;border-radius:50%;background:#3a2a14;transform:translateZ(1px)}
+#game .disc .topface{position:absolute;inset:0;border-radius:50%;transform:translateZ(12px);
+  background:radial-gradient(circle at 50% 50%,#4a3212 0 6px,#fff0c4 7px 8px,#c49a52 9px 17px,#f1d38f 18px 19px,#a57a35 20px 26px,#e7c47a 27px 29px,#6b4a1c 30px)}
+#game .disc i{position:absolute;left:50%;top:50%;width:9.8px;height:12px;margin-left:-4.9px;transform-origin:50% 0;
+  transform:translateZ(1px) rotateZ(var(--a)) translateY(29.6px) rotateX(-90deg);
+  background:linear-gradient(180deg,#6b4a1c,#c49a52 35%,#f1d38f 70%,#e7c47a);filter:brightness(var(--sh));backface-visibility:hidden}
+/* the cloth hangs a little lower now that the flag is upright */
+#game canvas.cloth{top:34px!important}
+
+/* ===== flame v2: blue root, layered body, natural flicker driven from script ===== */
+#game .fbody{position:absolute;left:0;bottom:0;transform-origin:0 0;transform:scale(var(--jx,1),var(--jy,1)) skewX(var(--sk,0deg))}
+#game .f0{position:absolute;display:block;left:0;bottom:0;width:13px;height:9px;margin-left:-6.5px;margin-bottom:-4px;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 70%,rgba(140,190,255,.95),rgba(60,110,255,.5) 50%,rgba(40,80,255,0) 75%);filter:blur(.4px)}
+#game .f1{filter:blur(.8px)!important;opacity:.95}
+#game .f4{position:absolute;display:block;left:0;bottom:0;width:34px;height:58px;margin-left:-17px;margin-bottom:-6px;border-radius:50% 50% 45% 45%/65% 65% 35% 35%;
+  background:radial-gradient(ellipse at 50% 85%,rgba(255,120,30,.55),rgba(255,60,10,.25) 50%,rgba(200,30,0,0) 72%);filter:blur(3px);transform-origin:50% 100%;animation:f1 .3s ease-in-out infinite alternate}
+#game .ember-base{position:absolute;display:block;left:0;bottom:0;width:18px;height:8px;margin:0 0 -5px -9px;border-radius:50%;background:radial-gradient(ellipse,#fff3c0,#ff9a2a 45%,rgba(255,60,0,0) 75%);filter:blur(.5px)}
+
+/* ===== guesses left: one clear number in a gold medallion ===== */
+#game .guesses{display:flex;align-items:center;gap:10px}
+#game .guesses b{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:400;font-size:38px;line-height:1;color:#fff;
+  background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--tc) 70%,#fff 0%),color-mix(in srgb,var(--tc) 55%,#000) 75%);
+  box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 0 0 7px #120d09,0 0 22px -2px var(--tc),inset 0 2px 0 rgba(255,255,255,.25),inset 0 -4px 8px rgba(0,0,0,.45);
+  text-shadow:0 2px 0 #000,0 0 12px var(--tc)}
+#game .guesses span{font-size:16px;line-height:1.1;color:var(--ink2);text-align:left}
+#game .guesses.pop b{animation:gpop .7s cubic-bezier(.2,1.6,.4,1)}
+@keyframes gpop{0%{transform:scale(1.5);filter:brightness(2)}100%{transform:scale(1);filter:none}}
+/* bigger flame at the low camera angle */
+#game .fuseflame{transform:translate(var(--fx,490px),var(--fy,36px)) translateZ(6px) rotateX(calc(var(--tilt) * -1)) scale(2.1)!important}
+
+/* flame drawn upright in the overlay, placed over the burn point projected from the table */
+#game .burnpt{position:absolute;left:0;top:0;width:2px;height:2px;pointer-events:none;transform:translate(var(--fx,490px),var(--fy,40px)) translateZ(4px)}
+#game .fuseflame{position:absolute!important;z-index:14;left:0;top:0;width:0;height:0;pointer-events:none;transform:translate(var(--px,0px),var(--py,0px)) scale(1.7)!important}
+
+/* ===== bigger table ===== */
+#game .table{left:110px!important;top:100px!important;width:1060px!important;height:680px!important}
+#game .grid{left:83px!important;top:118px!important;width:894px!important;height:488px!important;grid-template-columns:repeat(5,166px)!important;grid-auto-rows:110px!important}
+#game .ropecv{width:1060px!important;height:680px!important}
+#game .word{font-size:24px}
+
+/* ===== clue tablet: just the clue and its number ===== */
+#game .tablet{width:auto!important;min-width:420px;top:70px!important;padding:10px 30px 14px!important}
+#game .tablet .row{gap:20px!important}
+#game .tablet .clue{font-size:64px!important;line-height:1!important;letter-spacing:.01em}
+#game .cnum{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font-size:46px;line-height:1;color:#fff;flex:none;
+  background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--tc) 85%,#fff 0%),color-mix(in srgb,var(--tc) 45%,#000) 78%);
+  box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 0 0 7px #120d09,0 0 26px -2px var(--tc),inset 0 2px 0 rgba(255,255,255,.25),inset 0 -5px 10px rgba(0,0,0,.45);text-shadow:0 2px 0 #000}
+#game .cnum.E{--tc:var(--E)}#game .cnum.A{--tc:var(--A)}
+#game .tablet .who{font-size:15px!important;letter-spacing:.04em}
+
+/* ===== guesses left: beside End turn, where guessers look ===== */
+#game .gbadge{position:absolute;z-index:20;right:28px;bottom:166px;display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;
+  background:rgba(20,15,11,.88);border:1px solid var(--gold2);box-shadow:0 8px 18px rgba(0,0,0,.5)}
+#game .gbadge b{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:400;font-size:30px;line-height:1;color:#fff;
+  background:radial-gradient(circle at 50% 38%,var(--tc),color-mix(in srgb,var(--tc) 45%,#000) 80%);box-shadow:0 0 0 2px #120d09,0 0 0 4px var(--gold2),0 0 16px -2px var(--tc);text-shadow:0 2px 0 #000}
+#game .gbadge span{font-size:16px;line-height:1.05;color:var(--ink)}
+#game .gbadge.E{--tc:var(--E)}#game .gbadge.A{--tc:var(--A)}
+#game .gbadge.pop b{animation:gpop .7s cubic-bezier(.2,1.6,.4,1)}
+#game .endturn{bottom:90px!important}
+
+/* ===== flags hang beside the table, facing the camera ===== */
+#game .flag2d{position:absolute;z-index:12;top:150px;width:150px;height:440px;pointer-events:none;transform-style:flat}
+#game .flag2d.l{left:4px;transform:perspective(900px) rotateY(12deg)}
+#game .flag2d.r{right:4px;transform:perspective(900px) rotateY(-12deg)}
+#game .flag2d i{position:absolute;display:block}
+#game .pole2d{left:69px;top:8px;bottom:26px;width:12px;border-radius:6px;
+  background:linear-gradient(90deg,#3e2a0e 0%,#a57a35 18%,#f6dfa4 38%,#e7c47a 52%,#9a7030 78%,#3a270c 100%);box-shadow:4px 0 8px rgba(0,0,0,.45)}
+#game .finial2d{left:61px;top:-10px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fffbe8 0,#f1d38f 22%,#c49a52 55%,#6b4a1c 100%);box-shadow:0 4px 8px rgba(0,0,0,.55)}
+#game .bar2d{left:2px;right:2px;top:26px;height:12px;border-radius:6px;
+  background:linear-gradient(180deg,#3e2a0e 0%,#a57a35 18%,#f6dfa4 40%,#e7c47a 55%,#9a7030 80%,#3a270c 100%);box-shadow:0 5px 8px rgba(0,0,0,.5)}
+#game .bar2d::before, #game .bar2d::after{content:"";position:absolute;top:-5px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fffbe8,#e7c47a 35%,#8a6428 85%)}
+#game .bar2d::before{left:-8px}#game .bar2d::after{right:-8px}
+#game .collar{left:63px;bottom:24px;width:24px;height:12px;border-radius:4px;background:linear-gradient(90deg,#3e2a0e,#c49a52 30%,#fff0c4 48%,#a57a35 75%,#3a270c)}
+#game .spike{left:66px;bottom:0;width:18px;height:26px;clip-path:polygon(0 0,100% 0,50% 100%);background:linear-gradient(90deg,#3e2a0e,#e7c47a 45%,#8a6428 80%,#3a270c)}
+#game .flag2d canvas.cloth{position:absolute;left:8px;top:32px!important;width:134px;height:262px;transform:none!important;filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
+
+/* ===== fire canvas ===== */
+#game .fuseflame{transform:translate(var(--px,0px),var(--py,0px))!important}
+#game #firecv{position:absolute;left:-80px;top:-205px;width:160px;height:220px}
+
+/* ===== suggestions: mark cards before revealing ===== */
+#game .slot.marked .tile{--z:26px!important}
+#game .slot.marked .plate{animation:markpulse 1.8s ease-in-out infinite}
+@keyframes markpulse{50%{box-shadow:inset 0 0 0 3px #2a2018,0 0 0 2px #fff3cf,0 0 44px rgba(231,196,122,.95)}}
+#game .slot.mine .plate{border-color:#fff0c4}
+#game .pin{display:flex!important;gap:4px;flex-wrap:nowrap;left:8px;top:-8px}
+#game .slot:not(.marked) .pin{display:none!important}
+#game .pin .tg{display:flex;align-items:center;gap:4px;background:var(--gold);color:#1b120a;padding:1px 8px 1px 2px;border-radius:999px;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,.6);white-space:nowrap}
+#game .pin .tg i{width:18px;height:18px;border-radius:50%;color:#fff;font-style:normal;font-size:11px;display:grid;place-items:center;background:#7a1a2a}
+#game .pin .tg.you{background:#fff0c4}
+#game .rbtn{position:absolute;left:50%;bottom:-16px;z-index:6;transform-origin:50% 100%;transform:translateX(-50%) translateZ(40px) rotateX(calc(var(--tilt) * -1));
+  padding:3px 18px;border-radius:999px;border:0;font:inherit;font-size:16px;color:#2a1a0c;cursor:pointer;display:none;
+  background:radial-gradient(ellipse at 50% 30%,#f6dc9f,#c8954a 70%);box-shadow:0 0 0 2px #120d09,0 0 0 3px var(--gold2),0 4px 0 #5a3d16,0 8px 14px rgba(0,0,0,.6)}
+#game .slot.marked .rbtn{display:block}
+#game .rbtn:hover{filter:brightness(1.1)}
+#game .slot.peek .plate{box-shadow:inset 0 0 0 3px #2a2018,0 0 0 3px #fff,0 0 50px rgba(255,240,200,1)!important}
+#game .shortlist{position:absolute;z-index:20;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;max-width:640px;
+  border-radius:14px;background:rgba(20,15,11,.9);border:1px solid var(--gold2);box-shadow:0 10px 24px rgba(0,0,0,.6);animation:vup .35s ease-out}
+#game .shortlist[hidden]{display:none}
+#game .shortlist .lbl{font-size:14px;color:var(--mute);white-space:nowrap}
+#game .shortlist .chip{display:flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:10px;background:linear-gradient(180deg,#3a2e22,#211913);border:1px solid rgba(231,196,122,.45);font-size:17px;color:var(--ink);white-space:nowrap}
+#game .shortlist .chip .dots{display:flex}
+#game .shortlist .chip .dots i{width:16px;height:16px;border-radius:50%;margin-left:-4px;background:#7a1a2a;border:1px solid var(--gold2);font-style:normal;font-size:9px;color:#fff;display:grid;place-items:center}
+#game .shortlist .chip button{border:0;border-radius:8px;padding:2px 10px;font:inherit;font-size:14px;color:#2a1a0c;cursor:pointer;background:radial-gradient(ellipse at 50% 30%,#f6dc9f,#c8954a 70%)}
+
+#game .dock{position:absolute;z-index:20;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:10px}
+#game .dock .gbadge{position:static}
+#game .dock .shortlist{position:static;transform:none}
+
+/* name tags and Reveal float well above a lifted card, so they never cut through it */
+#game .pin{transform:translateZ(70px) rotateX(calc(var(--tilt) * -1))!important}
+#game .rbtn{transform:translateX(-50%) translateZ(64px) rotateX(calc(var(--tilt) * -1))!important}
+
+/* flag parts sized from the flag box so both styles share them */
+#game .flag2d .pole2d{left:calc(50% - 6px)}
+#game .flag2d .finial2d{left:calc(50% - 14px)}
+#game .flag2d .collar{left:calc(50% - 12px)}
+#game .flag2d .spike{left:calc(50% - 9px)}
+#game .flag2d canvas.cloth{left:50%!important;transform:translateX(-50%)!important}
+#game .pole2d{background:linear-gradient(90deg,#2e1f08 0%,#8a6428 14%,#e7c47a 30%,#fffbe8 40%,#e7c47a 50%,#a57a35 70%,#5a3d16 86%,#24180a 100%)!important}
+#game .bar2d{background:linear-gradient(180deg,#2e1f08 0%,#8a6428 16%,#e7c47a 32%,#fffbe8 44%,#e7c47a 56%,#9a7030 78%,#2e1f08 100%)!important}
+
+/* ---- huge flags: giant banners in the background on each side ---- */
+#game .canvas.flags-huge .flag2d{z-index:1;top:-40px;width:340px;height:930px;filter:brightness(.82) saturate(.95)}
+#game .canvas.flags-huge .flag2d.l{left:-74px;transform:perspective(1400px) rotateY(24deg)}
+#game .canvas.flags-huge .flag2d.r{right:-74px;transform:perspective(1400px) rotateY(-24deg)}
+#game .canvas.flags-huge .flag2d .pole2d{width:18px;left:calc(50% - 9px);top:14px;bottom:0}
+#game .canvas.flags-huge .flag2d .finial2d{width:44px;height:44px;left:calc(50% - 22px);top:-14px}
+#game .canvas.flags-huge .flag2d .bar2d{height:18px;top:40px;left:4px;right:4px}
+#game .canvas.flags-huge .flag2d .bar2d::before, #game .canvas.flags-huge .flag2d .bar2d::after{width:30px;height:30px;top:-6px}
+#game .canvas.flags-huge .flag2d .collar, #game .canvas.flags-huge .flag2d .spike{display:none}
+#game .canvas.flags-huge .flag2d canvas.cloth{top:50px!important}
+/* the agent counters move to the team portraits */
+#game .agents{display:none;align-items:center;gap:5px;margin-top:4px}
+#game .canvas.flags-huge .agents{display:flex}
+#game .agents b{font-weight:400;font-size:22px;color:#fff;margin-right:4px;text-shadow:0 0 10px var(--tc),0 2px 0 #000}
+#game .agents small{font-size:13px;color:var(--ink2);margin-right:6px}
+#game .agents i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);box-shadow:0 0 0 1.5px var(--gold2),0 0 10px -2px var(--tc)}
+#game .agents i img{width:15px;height:15px;object-fit:contain}
+#game .agents i.gone{box-shadow:0 0 0 1.5px rgba(140,110,60,.5)}
+#game .agents i.gone img{opacity:.2;filter:grayscale(1)}
+#game .hud.them .agents{justify-content:flex-end}
+
+/* tags and Reveal sit on the card face, lifting with it */
+#game .tile .pin{position:absolute;left:8px;top:-11px;z-index:6;transform:translateZ(2px)!important;pointer-events:none}
+#game .tile .rbtn{position:absolute;left:50%;bottom:8px;top:auto;z-index:6;transform:translateX(-50%) translateZ(2px)!important;font-size:15px;padding:2px 16px}
+#game .slot.rev .pin, #game .slot.rev .rbtn, #game .slot.flipping .pin, #game .slot.flipping .rbtn{display:none!important}
+#game .slot.marked .word{transform:translateY(-8px)}
+
+/* ===== realism pass: one warm overhead light, real shadows, far less glow ===== */
+#game .canvas{background:radial-gradient(1100px 640px at 50% 56%,#2c2015 0%,#17110b 52%,#080605 100%)!important}
+#game .canvas::after{box-shadow:inset 0 0 220px 70px rgba(0,0,0,.9)!important}
+#game .motes{opacity:.32!important}
+#game .top{background:
+    radial-gradient(ellipse 58% 62% at 50% 50%,rgba(255,214,150,.20),rgba(255,190,120,.06) 55%,rgba(0,0,0,.35) 100%),
+    var(--wood) center/520px 520px,
+    linear-gradient(180deg,#3d2a19,#2a1d12)!important;
+  box-shadow:inset 0 0 0 3px #1c130b,inset 0 0 0 5px #6b4e28,inset 0 0 0 6px rgba(255,220,160,.35),inset 0 0 0 12px #1f150d,inset 0 18px 40px rgba(0,0,0,.55),inset 0 -12px 30px rgba(0,0,0,.5)!important}
+#game .top::before{opacity:.07!important}
+#game .lightpool{opacity:.35!important}
+#game .edge{background:linear-gradient(180deg,#4a3420,#1a120a)!important}
+/* cards: matte stone with a crisp bevel, grounded by a soft contact shadow */
+#game .plate{box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(231,196,122,.38),inset 0 1px 0 rgba(255,240,210,.22),inset 0 -4px 10px rgba(0,0,0,.45)!important}
+#game .shadow{background:rgba(0,0,0,.72)!important;filter:blur(7px)!important;inset:6px 2px -4px 2px!important}
+#game .slot:not(.rev):hover .plate{box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(242,212,145,.7),inset 0 1px 0 rgba(255,240,210,.25)!important}
+#game .slot.marked .plate{animation:none!important;box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px #f2d491,0 0 0 2px rgba(242,212,145,.85)!important}
+#game .word{text-shadow:0 1px 0 rgba(0,0,0,.9),0 2px 3px rgba(0,0,0,.6)!important}
+/* type and HUD: printed and engraved, not glowing */
+#game .tablet .clue{text-shadow:0 2px 0 #000,0 3px 6px rgba(0,0,0,.5)!important}
+#game .tablet .clue span{text-shadow:none!important}
+#game .cnum{box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 0 0 7px #120d09,0 6px 12px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.22),inset 0 -5px 10px rgba(0,0,0,.45)!important}
+#game .gbadge b{box-shadow:0 0 0 2px #120d09,0 0 0 4px var(--gold2),0 4px 8px rgba(0,0,0,.6)!important}
+#game .portrait{box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 0 0 8px #120d09,0 10px 22px rgba(0,0,0,.7)!important}
+#game .portrait.active{animation:none!important;box-shadow:0 0 0 3px #120d09,0 0 0 6px #f2d491,0 0 0 8px #120d09,0 10px 22px rgba(0,0,0,.7)!important}
+#game .hinfo .n{text-shadow:0 2px 0 #000,0 3px 8px rgba(0,0,0,.6)!important}
+#game .endturn{box-shadow:0 0 0 3px #120d09,0 0 0 6px var(--gold2),0 7px 0 #4a3212,0 14px 22px rgba(0,0,0,.65)!important}
+#game .endturn:hover{box-shadow:0 0 0 3px #120d09,0 0 0 6px #f2d491,0 7px 0 #4a3212,0 14px 22px rgba(0,0,0,.65)!important}
+#game .tablet{box-shadow:inset 0 0 0 3px #2a2018,inset 0 0 0 4px rgba(231,196,122,.35),0 18px 30px rgba(0,0,0,.65),0 4px 8px rgba(0,0,0,.5)!important}
+#game .feed div{background:rgba(14,10,7,.85)!important}
+#game .flag2d{filter:drop-shadow(10px 18px 14px rgba(0,0,0,.55))}
+#game .canvas.flags-huge .flag2d{filter:brightness(.78) saturate(.92) drop-shadow(14px 24px 20px rgba(0,0,0,.6))}
+#game .ribbon span{text-shadow:0 3px 0 #000,0 4px 12px rgba(0,0,0,.6)!important}
+
+#game .agents{gap:3px}
+#game .agents i{width:18px;height:18px}
+#game .agents i img{width:12px;height:12px}
+#game .agents b{font-size:19px}
+#game .canvas.flags-huge .hud.room, #game .canvas.flags-huge .hud.hero .hinfo{background:rgba(10,7,5,.62);padding:4px 10px;border-radius:10px;backdrop-filter:blur(3px)}
+
+/* ===== thicker cards: a deep layered body with a gold-to-dark edge ===== */
+#game .tile{--z:13px}
+#game .slot:not(.rev):hover .tile{--z:44px!important;--rx:-10deg}
+#game .slot.marked .tile{--z:32px!important}
+#game .slot.rev .tile{--z:13px!important}
+#game .layer{border-radius:9px}
+#game .layer.l1{transform:translateZ(-1.6px);background:#b48a48}
+#game .layer.l2{transform:translateZ(-3.2px);background:#9a7438}
+#game .layer.l3{transform:translateZ(-4.8px);background:#7f5e2c}
+#game .layer.l4{transform:translateZ(-6.4px);background:#664a22}
+#game .layer.l5{transform:translateZ(-8px);background:#4f391a}
+#game .layer.l6{transform:translateZ(-9.6px);background:#3a2913}
+#game .layer.l7{transform:translateZ(-11.2px);background:#24190b}
+#game .slot:not(.rev):hover .shadow{transform:translateZ(1px) translate(8px,14px) scale(1.08);opacity:.45}
+
+/* ===== flags: rod in front of the cloth, rings, cords and tassels ===== */
+#game .flag2d canvas.cloth{top:30px!important}
+#game .ring2d{position:absolute;top:24px;left:calc(var(--x) - 6px);width:12px;height:14px;border-radius:50%;border:2.5px solid #d9b56a;border-bottom-color:#8a6428;box-shadow:0 2px 3px rgba(0,0,0,.5)}
+#game .bar2d{top:22px!important;z-index:1}
+#game .finial2d{z-index:2}
+#game .cord2d{position:absolute;top:30px;width:2px;height:120px;background:linear-gradient(90deg,#8a6428,#f1d38f,#8a6428);transform-origin:50% 0;animation:cordsway 4.6s ease-in-out infinite alternate}
+#game .cord2d.cl{left:-2px}#game .cord2d.cr{right:-2px;animation-delay:-2.3s}
+#game .cord2d::after{content:"";position:absolute;left:-7px;bottom:-26px;width:16px;height:30px;border-radius:40% 40% 20% 20%;
+  background:repeating-linear-gradient(90deg,#8a6428 0 1.5px,#e7c47a 1.5px 3px);box-shadow:0 4px 6px rgba(0,0,0,.5)}
+#game .cord2d::before{content:"";position:absolute;left:-4px;bottom:0;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff3cf,#c49a52 55%,#6b4a1c)}
+@keyframes cordsway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+#game .flag2d{filter:drop-shadow(14px 22px 16px rgba(0,0,0,.6))}
+
+/* ===== a calm, warm lamp instead of a bright spotlight ===== */
+#game .top{background:
+    radial-gradient(ellipse 62% 66% at 48% 46%,rgba(255,170,96,.13),rgba(255,150,80,.05) 50%,rgba(0,0,0,.42) 100%),
+    var(--wood) center/520px 520px,
+    linear-gradient(180deg,#3a2817,#271a10)!important}
+#game .lightpool{opacity:.5!important;mix-blend-mode:soft-light;animation:lampbreath 7s ease-in-out infinite alternate!important;
+  background:radial-gradient(ellipse 46% 42% at 46% 44%,rgba(255,160,80,.35),transparent 72%)!important}
+@keyframes lampbreath{0%{opacity:.38}35%{opacity:.52}60%{opacity:.42}100%{opacity:.55}}
+#game .canvas{background:radial-gradient(1000px 600px at 50% 54%,#24190f 0%,#140e09 52%,#070504 100%)!important}
+#game .motes{opacity:.22!important}
+@media (prefers-reduced-motion:reduce){#game .cord2d, #game .lightpool{animation:none!important}}
+
+/* ===== huge background banners (same design, scaled up behind the table) ===== */
+#game .flag2d{z-index:1!important;top:-24px!important;transform-origin:50% 0;filter:brightness(.82) drop-shadow(18px 30px 24px rgba(0,0,0,.65))!important}
+#game .flag2d.l{left:52px!important;transform:perspective(1300px) rotateY(22deg) scale(2.75)!important}
+#game .flag2d.r{right:52px!important;left:auto!important;transform:perspective(1300px) rotateY(-22deg) scale(2.75)!important}
+#game .hud.room, #game .hud.hero .hinfo{background:rgba(10,7,5,.62);padding:4px 10px;border-radius:10px;backdrop-filter:blur(3px)}
+
+/* ===== real 3D rope and fire, drawn by WebGL over the table ===== */
+#game #ropegl{position:absolute;left:0;top:0;width:1280px;height:820px;z-index:4;pointer-events:none}
+#game .canvas.gl-on .ropecv, #game .canvas.gl-on .fuseflame{display:none!important}
+#game .agents{display:flex!important}
+
+/* flags drawn at real size, so the gold frame stays sharp */
+#game .flag2d{zoom:2.75;top:-9px!important}
+#game .flag2d.l{left:-29px!important;transform:perspective(480px) rotateY(22deg)!important}
+#game .flag2d.r{right:-29px!important;left:auto!important;transform:perspective(480px) rotateY(-22deg)!important}
+#game .flag2d{filter:brightness(.84)!important}
+#game .flag2d canvas.cloth{filter:drop-shadow(4px 8px 7px rgba(0,0,0,.6))}
+/* polished gold: a bright specular core, warm mid-tones and a dark rim on every round part */
+#game .flag2d .pole2d, #game .flag2d .bar2d{box-shadow:0 2px 4px rgba(0,0,0,.55)}
+#game .flag2d .bar2d{background:linear-gradient(180deg,#2a1b07 0%,#7a5520 12%,#c9a05a 26%,#fff6d8 38%,#f0d28e 46%,#c49a52 62%,#8a6428 80%,#2a1b07 100%)!important}
+#game .flag2d .pole2d{background:linear-gradient(90deg,#2a1b07 0%,#7a5520 12%,#c9a05a 26%,#fff6d8 38%,#f0d28e 46%,#c49a52 62%,#8a6428 80%,#2a1b07 100%)!important}
+#game .flag2d .finial2d, #game .flag2d .bar2d::before, #game .flag2d .bar2d::after, #game .flag2d .cord2d::before{
+  background:radial-gradient(circle at 34% 28%,#ffffff 0,#fff3cf 9%,#f0d28e 22%,#c9a05a 42%,#8a6428 68%,#3a270c 100%)!important;
+  box-shadow:inset -2px -3px 4px rgba(40,22,4,.55),inset 1px 1px 2px rgba(255,250,230,.5),0 3px 5px rgba(0,0,0,.55)!important}
+#game .flag2d .ring2d{border-color:#f0d28e #8a6428 #5a3d16 #c9a05a!important;box-shadow:0 1px 2px rgba(0,0,0,.6),inset 0 0 1px rgba(255,248,220,.6)!important}
+#game .flag2d .cord2d{background:linear-gradient(90deg,#5a3d16,#f6e2ac 50%,#5a3d16)!important}
+#game .flag2d .cord2d::after{background:repeating-linear-gradient(90deg,#7a5520 0 1px,#f0d28e 1px 2px,#c49a52 2px 3px)!important;border-radius:45% 45% 25% 25%!important;box-shadow:inset 0 -4px 6px rgba(40,22,4,.5),0 3px 5px rgba(0,0,0,.5)!important}
+
+/* flashy reveal effects */
+#game #fxcv{position:absolute;left:0;top:0;width:1280px;height:820px;z-index:18;pointer-events:none}
+#game .revflash{position:absolute;inset:0;z-index:17;pointer-events:none;opacity:0;background:radial-gradient(circle at var(--fx) var(--fy),var(--fc),transparent 55%);animation:revflash .7s ease-out}
+@keyframes revflash{0%{opacity:.85}100%{opacity:0}}
+#game .voiddark{position:absolute;inset:0;z-index:17;pointer-events:none;background:radial-gradient(circle at var(--fx) var(--fy),rgba(0,0,0,.2),rgba(0,0,0,.88) 70%);animation:voiddark 2.6s ease-out forwards}
+@keyframes voiddark{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+
+#game .anc{position:absolute;width:1px;height:1px;pointer-events:none}
+/* the 3D gold sits between the banners and the table */
+#game #goldgl{position:absolute;left:0;top:0;width:1280px;height:820px;z-index:1;pointer-events:none}
+#game .canvas.gold-on .flag2d .pole2d, #game .canvas.gold-on .flag2d .bar2d, #game .canvas.gold-on .flag2d .finial2d, #game .canvas.gold-on .flag2d .ring2d, #game .canvas.gold-on .flag2d .cord2d, #game .canvas.gold-on .flag2d .collar, #game .canvas.gold-on .flag2d .spike{visibility:hidden}
+
+/* no shortlist */
+#game .shortlist{display:none!important}
+
+/* ===== End turn: a heavy gold-rimmed seal in the current team's colour ===== */
+#game .endturn{width:176px!important;height:76px!important;padding:0!important;border-radius:40px!important;right:24px!important;bottom:22px!important;
+  background:none!important;box-shadow:none!important;color:#fff3d6!important;isolation:isolate;--tc:#ef5468;--td:#5a0e1c;transition:transform .18s cubic-bezier(.2,.8,.2,1)!important}
+#game .endturn[data-team="A"]{--tc:#74aef5;--td:#0e2446}
+#game .endturn .et-ring{position:absolute;inset:0;border-radius:40px;z-index:-2;
+  background:conic-gradient(from var(--spin,0deg),#7a5520,#f6dfa4,#c49a52,#5a3d16,#e7c47a,#fff6d8,#a57a35,#7a5520);
+  box-shadow:0 0 0 2px #120d09,0 9px 0 #3a270c,0 16px 26px rgba(0,0,0,.7),0 0 26px -4px var(--tc);animation:etspin 6s linear infinite}
+@property --spin{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes etspin{to{--spin:360deg}}
+#game .endturn .et-face{position:absolute;inset:5px;border-radius:36px;z-index:-1;display:flex;align-items:center;justify-content:center;gap:10px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--tc) 75%,#fff 0%),var(--tc) 30%,var(--td) 90%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -6px 12px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.45)}
+#game .endturn .et-face::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,250,230,.45) 50%,transparent 65%) -160% 0/220% 100% no-repeat;animation:etsheen 3.6s ease-in-out infinite}
+@keyframes etsheen{0%,55%{background-position:-160% 0}100%{background-position:160% 0}}
+#game .endturn .et-label{font-size:25px;line-height:1;letter-spacing:.02em;text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 10px rgba(0,0,0,.35)}
+#game .endturn .et-arrow{width:24px;height:24px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6));transition:transform .25s cubic-bezier(.2,1.6,.4,1)}
+#game .endturn:hover{transform:translateY(-3px)!important;filter:none!important}
+#game .endturn:hover .et-arrow{transform:translateX(5px)}
+#game .endturn:hover .et-ring{box-shadow:0 0 0 2px #120d09,0 12px 0 #3a270c,0 20px 30px rgba(0,0,0,.7),0 0 40px 2px var(--tc)}
+#game .endturn:active{transform:translateY(5px)!important}
+#game .endturn:active .et-ring{box-shadow:0 0 0 2px #120d09,0 3px 0 #3a270c,0 8px 14px rgba(0,0,0,.7),0 0 20px -4px var(--tc)}
+#game .endturn:focus-visible{outline:3px solid #fff3cf;outline-offset:4px}
+@media (prefers-reduced-motion:reduce){#game .endturn .et-ring, #game .endturn .et-face::after{animation:none}}
+#game .endturn{z-index:31!important}
+#game .endturn .et-label{color:#fff4d6!important;-webkit-text-fill-color:#fff4d6;text-shadow:0 2px 0 rgba(60,8,16,.85),0 0 12px rgba(255,220,170,.35)!important}
+#game .endturn .et-arrow{color:#ffe9b0}
+
+/* the team whose turn it is: banner lit, glow behind it; the other banner sinks into shadow */
+#game .flag2d{filter:brightness(.5) saturate(.75)!important;transition:filter .9s ease}
+#game .flag2d.active{filter:brightness(1.04) saturate(1.08)!important}
+#game .flagglow{position:absolute;top:-40px;bottom:-40px;width:620px;z-index:0;pointer-events:none;opacity:0;transition:opacity .9s ease}
+#game .flagglow.l{left:-150px;background:radial-gradient(ellipse 46% 52% at 50% 42%,rgba(255,80,105,.42),rgba(255,60,90,.12) 45%,transparent 72%)}
+#game .flagglow.r{right:-150px;background:radial-gradient(ellipse 46% 52% at 50% 42%,rgba(110,170,255,.42),rgba(90,150,255,.12) 45%,transparent 72%)}
+#game .flagglow.active{opacity:1;animation:glowbreath 3.4s ease-in-out infinite}
+@keyframes glowbreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+@media (prefers-reduced-motion:reduce){#game .flagglow.active{animation:none}}
+
+/* ===== End turn, spruced up: emblem stamp, rivets, carved groove, breathing glow, press flash ===== */
+#game .endturn{width:196px!important}
+#game .endturn .et-ring::after{content:"";position:absolute;inset:0;border-radius:40px;pointer-events:none;
+  background:radial-gradient(circle at 14px 50%,#fff3cf 0 2px,#8a6428 2.6px,transparent 3.4px),radial-gradient(circle at calc(100% - 14px) 50%,#fff3cf 0 2px,#8a6428 2.6px,transparent 3.4px),
+    radial-gradient(circle at 50% 3px,#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px),radial-gradient(circle at 50% calc(100% - 3px),#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px)}
+#game .endturn .et-face{inset:7px!important;gap:9px!important;padding:0 14px 0 8px;
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.35),inset 0 0 0 4px rgba(255,230,180,.18),inset 0 0 0 5px rgba(0,0,0,.4),inset 0 3px 0 rgba(255,255,255,.28),inset 0 -7px 14px rgba(0,0,0,.5)!important}
+#game .endturn .et-emb{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 40% 32%,rgba(255,255,255,.22),rgba(0,0,0,.25) 70%);box-shadow:inset 0 2px 4px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,240,210,.25),0 1px 0 rgba(255,240,210,.18)}
+#game .endturn .et-emb img{width:28px;height:28px;object-fit:contain;filter:sepia(1) saturate(2.4) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 1px 0 rgba(0,0,0,.7))}
+#game .endturn .et-label{font-size:24px!important;letter-spacing:.03em}
+#game .endturn .et-ring{animation:etspin 6s linear infinite,etbreath 2.8s ease-in-out infinite!important}
+@keyframes etbreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
+#game .endturn.pressed .et-face::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle,rgba(255,250,230,.85),transparent 60%);animation:etflash .45s ease-out forwards}
+@keyframes etflash{from{opacity:1;transform:scale(.4)}to{opacity:0;transform:scale(1.4)}}
+
+/* ===== top-left plaque: carved wood in a gold frame ===== */
+#game .hud.room.plaque{background:none!important;backdrop-filter:none!important;padding:8px 10px 8px 8px!important;border-radius:14px!important;gap:12px!important;isolation:isolate;left:18px!important;top:16px!important}
+#game .hud.room.plaque::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:14px;
+  background:var(--wood,none) center/260px 260px,linear-gradient(180deg,rgba(52,36,22,.96),rgba(24,16,10,.97));
+  box-shadow:inset 0 0 0 2px #120d09,inset 0 0 0 4px #c49a52,inset 0 0 0 5px #3a270c,inset 0 0 0 6px rgba(255,230,170,.35),inset 0 10px 18px rgba(0,0,0,.45),0 12px 22px rgba(0,0,0,.6)}
+#game .hud.room.plaque::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:14px;pointer-events:none;
+  background:radial-gradient(circle at 9px 9px,#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px),radial-gradient(circle at calc(100% - 9px) 9px,#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px),
+    radial-gradient(circle at 9px calc(100% - 9px),#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px),radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#fff3cf 0 1.6px,#8a6428 2.2px,transparent 3px)}
+#game .hud.room.plaque .menubtn{width:46px;height:46px;border-radius:12px;color:#2a1a0c;position:relative;
+  background:radial-gradient(ellipse at 50% 22%,#fffbe8,#f0d28e 24%,#c49a52 60%,#7a5520)!important;
+  box-shadow:0 0 0 2px #120d09,0 5px 0 #4a3212,0 9px 14px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.55),inset 0 -3px 6px rgba(80,45,10,.45)!important;transition:transform .12s}
+#game .hud.room.plaque .menubtn:hover{filter:brightness(1.08)}
+#game .hud.room.plaque .menubtn:active{transform:translateY(4px);box-shadow:0 0 0 2px #120d09,0 1px 0 #4a3212,0 3px 6px rgba(0,0,0,.6),inset 0 2px 0 rgba(255,255,255,.4)!important}
+#game .hud.room.plaque .menubtn svg{width:22px;height:22px;filter:drop-shadow(0 1px 0 rgba(255,240,200,.6))}
+#game .soundbtn .cross{display:none}
+#game .soundbtn.off .wave{display:none}#game .soundbtn.off .cross{display:inline}
+#game .pl-text{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding-right:2px}
+#game .hud.room.plaque .logo{font-size:30px!important;line-height:1!important;background:linear-gradient(180deg,#fff6d8 8%,#f0d28e 42%,#b68e4a 78%,#7a5520);-webkit-background-clip:text;background-clip:text;color:transparent!important;
+  text-shadow:none!important;filter:drop-shadow(0 2px 0 rgba(0,0,0,.85))}
+#game .roomtag{display:flex;align-items:center;gap:6px;padding:1px 8px 1px 9px;border-radius:999px;border:1px solid rgba(196,154,82,.7);background:rgba(10,7,4,.55);color:#d8c6a2;font:inherit;font-size:13px;cursor:pointer;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+#game .roomtag b{font-weight:400;color:#f0d28e;letter-spacing:.18em}
+#game .roomtag svg{width:13px;height:13px;color:#c49a52}
+#game .roomtag:hover{border-color:#f0d28e}
+#game .roomtag.copied{border-color:#7fd49a;color:#bff0cc}
+
+/* ===== Sound workshop ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width:700px){}
+#game .endturn{width:214px!important}
+#game .endturn .et-label{white-space:nowrap}
+#game .hud.room.plaque .logo{background:linear-gradient(180deg,#fffdf2 6%,#ffe7a8 40%,#e0b866 70%,#a87a32)!important;-webkit-background-clip:text!important;background-clip:text!important}
+#game .hud.room.plaque{z-index:31!important}
+
+#game .volrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+#game .volicon{width:20px;height:20px;color:#e7c47a;flex:none}
+#game .volval{min-width:42px;text-align:right;color:#f6ead0;font-size:15px;font-variant-numeric:tabular-nums}
+#game .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#game #volSlider{flex:1;-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;cursor:pointer;
+  background:linear-gradient(90deg,#e7c47a 0,#c49a52 var(--pct,80%),#2a2018 var(--pct,80%));box-shadow:inset 0 1px 2px rgba(0,0,0,.7),0 0 0 1px rgba(196,154,82,.5)}
+#game #volSlider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fffbe8,#f0d28e 30%,#c49a52 65%,#7a5520);box-shadow:0 2px 4px rgba(0,0,0,.6),0 0 0 2px #120d09}
+#game #volSlider::-moz-range-thumb{width:20px;height:20px;border:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fffbe8,#f0d28e 30%,#c49a52 65%,#7a5520);box-shadow:0 2px 4px rgba(0,0,0,.6),0 0 0 2px #120d09}
+#game #volSlider:focus-visible{outline:2px solid #fff3cf;outline-offset:4px}
+
+/* plaque layout: QR | wordmark + room | settings */
+#game .qrtile{width:58px;height:58px;padding:4px;border:0;border-radius:9px;cursor:pointer;flex:none;background:#efe0b8;
+  box-shadow:0 0 0 2px #120d09,0 0 0 4px #c49a52,0 0 0 5px #3a270c,0 5px 10px rgba(0,0,0,.6);transition:transform .15s}
+#game .qrtile img{width:100%;height:100%;display:block;image-rendering:pixelated}
+#game .qrtile:hover{transform:scale(1.06)}
+#game .qrtile:focus-visible{outline:2px solid #fff3cf;outline-offset:5px}
+#game .hud.room.plaque .gearbtn{width:34px!important;height:34px!important;border-radius:9px!important;align-self:center}
+#game .hud.room.plaque .gearbtn svg{width:19px!important;height:19px!important}
+#game .invite img.qr{width:96px;height:96px;padding:4px;border-radius:8px;background:#efe0b8;box-shadow:0 0 0 2px #c49a52;image-rendering:pixelated;flex:none}
+
+/* settings: a round gold medallion in a recessed socket */
+#game .hud.room.plaque{padding-right:14px!important}
+#game .hud.room.plaque .gearbtn{width:42px!important;height:42px!important;border-radius:50%!important;margin:0 0 0 4px;align-self:center;
+  background:radial-gradient(circle at 36% 28%,#fffbe8 0,#f6dfa4 18%,#d4ad62 46%,#9a7030 78%,#5a3d16 100%)!important;
+  box-shadow:0 0 0 2px #120d09,0 0 0 5px rgba(0,0,0,.45),0 3px 0 #4a3212,0 6px 10px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.7),inset 0 -3px 5px rgba(80,45,10,.5)!important;transition:transform .15s}
+#game .hud.room.plaque .gearbtn svg{width:22px!important;height:22px!important;color:#3a2410;filter:drop-shadow(0 1px 0 rgba(255,240,200,.65));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+#game .hud.room.plaque .gearbtn:hover svg{transform:rotate(60deg)}
+#game .hud.room.plaque .gearbtn:active{transform:translateY(2px);box-shadow:0 0 0 2px #120d09,0 0 0 5px rgba(0,0,0,.45),0 1px 0 #4a3212,0 2px 5px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.5)!important}
+
+/* ---------- real-app wrapper: the 1280x820 scene scaled to fit the window ---------- */
+#game.screen{position:fixed;inset:0;max-width:none;margin:0;padding:0;z-index:2;background:#050403;overflow:hidden;font-family:var(--f);color:var(--ink)}
+#game .stage{position:absolute;inset:0;overflow:hidden}
+#game .canvas{left:var(--ox,0px);top:var(--oy,0px)}
+#game button{font:inherit;color:inherit;cursor:pointer}
+#game .canvas:not(.can) .rbtn{display:none!important}
+#game .canvas:not(.can) .slot:not(.rev) .tile{cursor:default}
+#game .endturn[hidden]{display:none!important}
+#game .endturn.disabled{filter:grayscale(.6) brightness(.7);pointer-events:none}
+#game .dock[hidden]{display:none!important}
+#game .dock{z-index:31!important}
+#game .hud.hero{z-index:31!important}
+#game .hud.hero .portrait img{width:58px;height:58px;object-fit:contain}
+#game .tablet.formmode{top:10px!important;padding:6px 18px 8px!important}
+#game .clueform{gap:5px}
+#game .clueform input{height:44px;width:230px;font-size:26px}
+#game .clueform .give{height:44px;font-size:19px}
+#game .clueform .nums button{width:30px;height:30px;font-size:15px}
+#game .clueform .hint{display:none}
+/* clue entry on the tablet for the spymaster */
+#game .tablet .who.A{color:#b8d4ff}
+#game .tablet .wait{font-size:26px;line-height:1.15;color:#f6ead0;padding:4px 8px}
+#game .tablet .wait b{font-weight:400;color:var(--gold)}
+#game .clueform{display:flex;flex-direction:column;gap:8px;align-items:center;padding:2px 0 2px}
+#game .clueform .row{gap:10px!important}
+#game .clueform input{width:250px;height:52px;border-radius:10px;border:2px solid var(--gold2);background:#140e0a;color:#fff3d6;font:inherit;font-size:30px;text-align:center;
+  text-transform:uppercase;letter-spacing:.06em;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+#game .clueform input:focus{outline:none;border-color:#f2d491}
+#game .clueform .nums{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+#game .clueform .nums button{width:36px;height:36px;border-radius:50%;border:1px solid var(--gold2);background:#1d1611;font-size:18px;color:#f6ead0}
+#game .clueform .nums button[aria-pressed="true"]{background:var(--tc);border-color:#fff3cf;color:#fff}
+#game .clueform .give{height:52px;padding:0 20px;border-radius:12px;border:0;font-size:22px;color:#2a1a0c;
+  background:radial-gradient(ellipse at 50% 22%,#fffbe8,#f0d28e 24%,#c49a52 60%,#7a5520);box-shadow:0 0 0 2px #120d09,0 4px 0 #4a3212,0 7px 12px rgba(0,0,0,.6)}
+#game .clueform .give:active{transform:translateY(3px)}
+#game .clueform .err{min-height:1.2em;font-size:15px;color:#ff9aa6}
+#game .clueform .hint{font-size:13px;color:var(--mute)}
+#game .tablet.formmode{top:60px!important}
+/* menu sheet actions */
+#game .plist li .seat{margin-left:auto;display:flex;gap:6px}
+#game .plist .you{font-size:11px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+#game .plist .off{opacity:.55}
+#game .seatrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#game .sbtn.E{border-color:var(--E);color:#ffd6dc}#game .sbtn.A{border-color:var(--A);color:#d9e9ff}
+#game .confirmbox{border:1px solid #c4485a;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;background:rgba(90,20,30,.25)}
+#game .feed div{max-width:236px}

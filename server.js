@@ -9,7 +9,7 @@ const { packSummary } = require("./words");
 
 const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC = path.join(__dirname, "public");
-const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".webmanifest": "application/manifest+json" };
+const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon", ".webmanifest": "application/manifest+json", ".mp3": "audio/mpeg", ".txt": "text/plain; charset=utf-8" };
 const rooms = new Map();
 const CODE_RE = /^[A-Z]{4}$/;
 
@@ -31,7 +31,7 @@ let indexHtml = null;
 function sendIndex(res) {
   if (!indexHtml) {
     indexHtml = fs.readFileSync(path.join(PUBLIC, "index.html"), "utf8")
-      .replace(/(src|href)="\/(app\.js|fx\.js|style\.css)"/g, `$1="/$2?v=${BUILD}"`)
+      .replace(/(src|href)="\/(app\.js|fx\.js|style\.css|table\.css|table\.js|table-gl\.js)"/g, `$1="/$2?v=${BUILD}"`)
       .replace("{{BUILD}}", `build ${BUILD}${COMMIT ? ` · ${COMMIT}` : ""}`);
   }
   res.writeHead(200, { "Content-Type": MIME[".html"], "Cache-Control": "no-store" });

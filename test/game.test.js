@@ -29,7 +29,7 @@ test("board composition", () => {
   const c = (x) => g.roles.filter((y) => y === x).length;
   assert.equal(c(g.first), 7); assert.equal(c(g.first === "E" ? "A" : "E"), 6); assert.equal(c("B"), 6); assert.equal(c("X"), 1);
   assert.equal(g.turn, g.first); assert.equal(g.phase, "clue");
-  for (const w of g.words) assert.ok(!/etris|etrea|authority|ethiron/i.test(w), w);
+  for (const w of g.words) assert.ok(!/ministry|authority|vantablack/i.test(w), w);
 });
 
 test("only host starts; start needs both spymasters + operatives", () => {
@@ -99,12 +99,12 @@ test("unlimited guesses with 0 or ∞; end turn after a guess", () => {
   r.giveClue(spyOf(o), safeClue(r), "inf"); assert.equal(r.game.guessesLeft, null);
 });
 
-test("Ethiron loses instantly", () => {
+test("Vantablack Warrior loses instantly", () => {
   const r = setup(); r.start("p-host-0001");
   const t = r.game.turn;
   r.giveClue(spyOf(t), safeClue(r), 1);
   r.reveal(opOf(t), idx(r, "X"));
-  assert.equal(r.game.phase, "over"); assert.equal(r.game.reason, "ethiron"); assert.equal(r.game.winner, t === "E" ? "A" : "E");
+  assert.equal(r.game.phase, "over"); assert.equal(r.game.reason, "assassin"); assert.equal(r.game.winner, t === "E" ? "A" : "E");
   assert.ok(r.view("p-eop1-0003").game.roles.every((x) => x)); // key shown at the end
   throws(() => r.reveal(opOf(t), 0), /no game/);
 });

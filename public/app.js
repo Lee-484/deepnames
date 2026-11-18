@@ -21,9 +21,12 @@ function rid(bytes) {
 const pid = store.get("dn.pid") || (() => { const v = rid(12); store.set("dn.pid", v); return v; })();
 const token = store.get("dn.token") || (() => { const v = rid(24); store.set("dn.token", v); return v; })();
 
-const TEAM = { E: "Etreans", A: "Authority" };
+// Internal codes: E = Ministry (red), A = Authority (blue), B = bystander, X = Vantablack Warrior.
+const TEAM = { E: "Ministry", A: "Authority" };
+const POSS = { E: "Ministry’s", A: "Authority’s" };
 const OTHER = { E: "A", A: "E" };
-const ROLE_LINE = { E: "an <span class='tE'>Etrean</span> agent", A: "an <span class='tA'>Authority</span> agent", B: "a bystander", X: "<b>ETHIRON</b>" };
+const ASSASSIN = "Vantablack Warrior";
+const ROLE_LINE = { E: "a <span class='tE'>Ministry</span> agent", A: "an <span class='tA'>Authority</span> agent", B: "a bystander", X: "<b>the VANTABLACK WARRIOR</b>" };
 const glyph = (r, cls = "") => `<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true"><use href="#g-${r}"/></svg>`;
 const teamName = (t) => `<span class="t${t}">${TEAM[t]}</span>`;
 
@@ -97,7 +100,15 @@ const sfx = {
   turn() { tone(660, .2, { vol: .12 }); tone(990, .35, { vol: .12, at: .14 }); },
   win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, .5, { type: "triangle", vol: .13, at: i * .13 })); },
   start() { tone(392, .3, { vol: .12 }); tone(587, .5, { vol: .12, at: .18 }); },
+  deal() { for (let k = 0; k < 20; k++) noise(.05, { vol: .12, at: .05 + k * .06, freq: 2600 }); },
+  tick() { tone(1200, .06, { type: "square", vol: .05 }); },
 };
+function shake(small) {
+  if (window.FX && FX.reduce) return;
+  const el = $("#game");
+  el.classList.remove("shake", "shake-sm"); void el.offsetWidth;
+  el.classList.add(small ? "shake-sm" : "shake");
+}
 function syncSoundButtons() { $$("[data-sound] use").forEach((u) => u.setAttribute("href", muted ? "#i-mute" : "#i-sound")); }
 document.addEventListener("click", (e) => {
   if (e.target.closest("[data-sound]")) { muted = !muted; store.set("dn.muted", muted ? "1" : "0"); syncSoundButtons(); if (!muted) sfx.turn(); }
@@ -201,11 +212,23 @@ function canGuess() {
 }
 
 // ---------- render ----------
+const seenPlayers = new Set();
 function render() {
   if (!S) return;
   if (!S.game) { show("lobby"); renderLobby(); }
   else { show("game"); renderGame(); }
   if (sheetOpen) renderSheet();
+  S.players.forEach((p) => seenPlayers.add(p.id));
+}
+
+// Big cinematic ribbon across the middle of the screen.
+function banner(title, sub, team) {
+  const b = $("#banner");
+  b.className = `banner ${team || ""}`;
+  b.innerHTML = `<div class="banner-band">${team ? glyph(team, "banner-glyph") : ""}<span class="banner-title">${esc(title)}</span>${sub ? `<span class="banner-sub">${esc(sub)}</span>` : ""}</div>`;
+  void b.offsetWidth;
+  b.classList.add("show");
+  clearTimeout(banner.t); banner.t = setTimeout(() => b.classList.remove("show"), 2100);
 }
 
 function personRow(p, { actions = true } = {}) {
@@ -213,7 +236,7 @@ function personRow(p, { actions = true } = {}) {
   const host = p.id === S.hostId;
   const acts = actions && isHost() && !you
     ? `<span class="acts"><button class="btn tiny ghost" data-mkhost="${esc(p.id)}" type="button" title="Make host">Host</button><button class="btn tiny danger" data-kick="${esc(p.id)}" type="button" title="Remove from room">Remove</button></span>` : "";
-  return `<li class="person ${p.online ? "" : "off"}"><span class="dot" title="${p.online ? "Connected" : "Disconnected"}"></span>
+  return `<li class="person ${p.online ? "" : "off"} ${seenPlayers.has(p.id) ? "" : "enter"}"><span class="dot" title="${p.online ? "Connected" : "Disconnected"}"></span>
     <span class="pname">${esc(p.name)}</span>${host ? `<svg class="crown" aria-label="Host"><use href="#i-crown"/></svg>` : ""}${you ? `<span class="you">you</span>` : ""}${acts}</li>`;
 }
 
@@ -252,8 +275,8 @@ function renderLobby() {
 
   // start panel
   const checks = [
-    ["Etreans have a spymaster", !!S.players.find((p) => p.team === "E" && p.role === "spy")],
-    ["Authority have a spymaster", !!S.players.find((p) => p.team === "A" && p.role === "spy")],
+    ["Ministry has a spymaster", !!S.players.find((p) => p.team === "E" && p.role === "spy")],
+    ["Authority has a spymaster", !!S.players.find((p) => p.team === "A" && p.role === "spy")],
     ["Each side has at least one operative", S.players.some((p) => p.team === "E" && p.role === "op") && S.players.some((p) => p.team === "A" && p.role === "op")],
     [`At least 20 words switched on (${S.poolSize} now)`, S.poolSize >= 20],
   ];
@@ -321,7 +344,10 @@ async function copyLink() {
 function renderGame() {
   const g = S.game, m = me();
   $("#gameCode").textContent = S.code;
-  $("#scores").innerHTML = ["E", "A"].map((t) => `<span class="score ${t}"><b>${g.remaining[t]}</b><span>${TEAM[t]} left</span></span>`).join("");
+  const lastScore = renderGame.score || {};
+  $("#scores").innerHTML = ["E", "A"].map((t) => `<span class="score ${t} ${lastScore.id === g.id && lastScore[t] !== g.remaining[t] ? "pop" : ""}">${glyph(t)}<b>${g.remaining[t]}</b><span>${TEAM[t]} left</span></span>`).join("");
+  renderGame.score = { id: g.id, E: g.remaining.E, A: g.remaining.A };
+  $("#game").classList.toggle("doom", g.phase === "over" && g.reason === "assassin");
 
   // board
   if (boardGameId !== g.id) buildBoard(g);
@@ -338,10 +364,12 @@ function renderGame() {
     const marks = (g.marks[i] || []).map((id) => playerById(id)?.name || "?");
     el.classList.toggle("marked", !!marks.length && !g.revealed[i]);
     el.classList.toggle("mine", (g.marks[i] || []).includes(S.you));
-    el.querySelector(".marks").innerHTML = marks.slice(0, 3).map((n) => `<span>${esc(n)}</span>`).join("") + (marks.length > 3 ? `<span>+${marks.length - 3}</span>` : "");
+    const markHtml = g.revealed[i] ? "" : marks.slice(0, 3).map((n) => `<span>${esc(n)}</span>`).join("") + (marks.length > 3 ? `<span>+${marks.length - 3}</span>` : "");
+    const mk = el.querySelector(".marks");
+    if (mk.dataset.html !== markHtml) { mk.innerHTML = markHtml; mk.dataset.html = markHtml; }
     const can = guess && !g.revealed[i];
     el.classList.toggle("can", can);
-    el.setAttribute("aria-label", `${w}${g.revealed[i] ? ", revealed" : ""}${role && !g.revealed[i] ? `, ${role === "X" ? "Ethiron" : role === "B" ? "bystander" : TEAM[role]}` : ""}`);
+    el.setAttribute("aria-label", `${w}${g.revealed[i] ? ", revealed" : ""}${role && !g.revealed[i] ? `, ${role === "X" ? ASSASSIN : role === "B" ? "bystander" : TEAM[role]}` : ""}`);
     el.tabIndex = can ? 0 : -1;
   });
 
@@ -351,7 +379,7 @@ function renderGame() {
   let note = "";
   if (g.phase !== "over") {
     if (!m.team) note = g.sawKey ? "You're watching. You've seen the key this game, so you can rejoin a side next game." : "You're watching. Join a side from the panels to play.";
-    else if (m.role === "spy") note = "You're the spymaster: you see the key. Coloured cards belong to each side; black is Ethiron.";
+    else if (m.role === "spy") note = "You're the spymaster: you see the key. Red is Ministry, blue is Authority, sand is a bystander, black is the Vantablack Warrior.";
   }
   $("#viewerNote").textContent = note;
 
@@ -386,13 +414,13 @@ function renderGame() {
 function logLine(e) {
   const T = (t) => teamName(t);
   switch (e.k) {
-    case "start": return `<li class="${e.team}">${T(e.team)} go first.</li>`;
+    case "start": return `<li class="${e.team}">${T(e.team)} goes first.</li>`;
     case "clue": return `<li class="${e.team}"><b>${esc(e.by)}</b> gave the clue <b>${esc(e.word)} · ${e.n === "inf" ? "∞" : e.n}</b></li>`;
     case "reveal": return `<li class="${e.role === "X" ? "X" : e.team}"><b>${esc(e.by)}</b> revealed <b>${esc(e.word)}</b>: ${ROLE_LINE[e.role]}</li>`;
     case "out": return `<li class="${e.team}">${T(e.team)} used all their guesses.</li>`;
     case "end": return `<li class="${e.team}"><b>${esc(e.by)}</b> ended the ${T(e.team)} turn.</li>`;
     case "timeout": return `<li class="${e.team}">${T(e.team)} ran out of time.</li>`;
-    case "win": return `<li class="${e.team}"><b>${T(e.team)} win!</b></li>`;
+    case "win": return `<li class="${e.team}"><b>${T(e.team)} wins!</b></li>`;
     case "ended": return `<li>The host ended the game.</li>`;
     default: return "";
   }
@@ -403,28 +431,73 @@ const measure = document.createElement("canvas").getContext("2d");
 function fitWords() {
   const phone = innerWidth <= 640;
   measure.font = '700 100px "Cinzel Decorative", Cinzel, Georgia, serif';
+  const minReadable = phone ? 11.5 : 13;
   $$("#board .word").forEach((el) => {
     const plate = el.parentElement, cs = getComputedStyle(plate);
     const back = !!el.closest(".back");
     const availW = plate.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 6;
     const availH = plate.clientHeight * (back ? 0.62 : 0.78);
     if (availW <= 0) return;
-    const parts = el.textContent.split(/\s+/);
-    const unit = parts.map((t) => measure.measureText(t).width / 100);
+    const word = el.dataset.word || (el.dataset.word = el.textContent);
+    const max = back ? (phone ? 14 : 19) : (phone ? 16 : 24);
     const space = measure.measureText(" ").width / 100;
-    let size = Math.min(back ? (phone ? 14 : 19) : (phone ? 16 : 24), (availW / Math.max(...unit)) * 0.98);
-    const lineCount = (sz) => {
-      let n = 1, line = 0;
-      for (const u of unit) {
-        const w = u * sz;
-        if (line && line + space * sz + w > availW) { n++; line = w; } else line += (line ? space * sz : 0) + w;
-      }
-      return n;
+    const fit = (parts, forced) => {
+      const unit = parts.map((t) => measure.measureText(t).width / 100);
+      let size = Math.min(max, (availW / Math.max(...unit)) * 0.98);
+      const lineCount = (sz) => {
+        let n = 1, line = 0;
+        unit.forEach((u, k) => {
+          const w = u * sz;
+          if (line && (forced.has(k) || line + space * sz + w > availW)) { n++; line = w; } else line += (line ? space * sz : 0) + w;
+        });
+        return n;
+      };
+      while (size > 9 && lineCount(size) * size * 1.12 > availH) size -= 0.5;
+      return size;
     };
-    while (size > 9 && lineCount(size) * size * 1.12 > availH) size -= 0.5;
+    let parts = word.split(/\s+/);
+    let size = fit(parts, new Set());
+    let html = esc(word);
+    // A single long name too small to read: break it with a hyphen instead of shrinking it.
+    if (size < minReadable && parts.some((p) => p.length >= 8)) {
+      const out = [], forced = new Set(), pieces = [];
+      parts.forEach((p) => {
+        if (p.length >= 8) { const [a, b] = splitWord(p); out.push(a + "-"); out.push(b); forced.add(out.length - 1); pieces.push(`${esc(a)}-<br>${esc(b)}`); }
+        else { out.push(p); pieces.push(esc(p)); }
+      });
+      const split = fit(out, forced);
+      if (split > size + 1) { size = split; html = pieces.join(" "); }
+    }
+    if (el.innerHTML !== html) el.innerHTML = html;
     el.style.fontSize = Math.max(9, size).toFixed(1) + "px";
-    el.classList.toggle("tight", size <= 9.5);
   });
+}
+// Where to hyphenate a long name: at an existing hyphen, before a known word part
+// (Rime-breakers, Kyrs-glass, Necro-skipper), or else at a syllable-like break near the middle.
+const WORD_PARTS = ["breakers", "breaker", "shaper", "finder", "skipper", "glass", "charm", "draw", "call", "breathe", "cast", "sing", "rend",
+  "walker", "strider", "striker", "warder", "seer", "heart", "kindred", "trimmer", "chemist", "harper", "weaver", "daunt", "sucker",
+  "knight", "blade", "edge", "spark", "thorn", "claw", "splitter", "crusher", "bound", "skipper", "spindle", "spear", "fouler", "smith",
+  "light", "less", "fire", "stone", "storm", "wind", "frost", "shadow", "iron", "blood", "keeper", "guard", "lord", "master", "point", "tooth",
+  "power", "villager", "born", "fish", "fang", "glaive", "cleave", "screen", "sieger", "eye", "mare", "shoe", "monger", "scraper", "trick", "medallions", "pools", "wright"];
+const DIGRAPHS = new Set(["th", "sh", "ch", "ck", "gh", "ph", "wh", "qu", "ng", "kn", "wr"]);
+function splitWord(w) {
+  if (w.includes("-")) { const k = w.indexOf("-"); return [w.slice(0, k), w.slice(k + 1)]; }
+  const low = w.toLowerCase();
+  for (const part of WORD_PARTS) {
+    const k = low.lastIndexOf(part);
+    if (k >= 3 && w.length - k >= 3 && k + part.length === w.length) return [w.slice(0, k), w.slice(k)];
+  }
+  const V = /[aeiouy]/i, C = (ch) => !!ch && /[a-z]/i.test(ch) && !V.test(ch), mid = w.length / 2;
+  let best = null, bestScore = Infinity;
+  for (let i = 3; i <= w.length - 3; i++) {
+    let s = Math.abs(i - mid);
+    if (C(w[i - 1]) && C(w[i]) && V.test(w[i - 2]) && V.test(w[i + 1] || "")) s -= 0.5;      // VC|CV
+    else if (V.test(w[i - 1]) && C(w[i]) && V.test(w[i + 1] || "")) s -= 0.25;              // V|CV
+    else s += 2;
+    if (DIGRAPHS.has((w[i - 1] + w[i]).toLowerCase())) s += 4;
+    if (s < bestScore) { bestScore = s; best = i; }
+  }
+  return [w.slice(0, best), w.slice(best)];
 }
 if (document.fonts && document.fonts.load) document.fonts.load('700 100px "Cinzel Decorative"').then(fitWords).catch(() => {});
 let fitRaf = 0;
@@ -436,9 +509,11 @@ function buildBoard(g) {
   cardEls = g.words.map((w, i) => {
     const len = Math.max(...w.split(/\s+/).map((p) => p.length));
     const el = document.createElement("div");
-    el.className = "card"; el.setAttribute("role", "button"); el.dataset.i = i;
+    el.className = "card deal"; el.setAttribute("role", "button"); el.dataset.i = i;
+    el.style.setProperty("--i", i);
+    setTimeout(() => el.classList.remove("deal"), 1800 + i * 60);
     el.innerHTML = `<div class="flip">
-        <div class="face front"><div class="plate"><svg class="keyglyph" viewBox="0 0 64 64" aria-hidden="true"><use href="#g-B"/></svg><span class="word" style="--len:${len}">${esc(w)}</span></div></div>
+        <div class="face front"><div class="plate"><span class="shine"></span><svg class="keyglyph" viewBox="0 0 64 64" aria-hidden="true"><use href="#g-B"/></svg><span class="word" style="--len:${len}">${esc(w)}</span></div></div>
         <div class="face back"><div class="plate"><svg class="glyph" viewBox="0 0 64 64" aria-hidden="true"><use href="#g-B"/></svg><span class="word" style="--len:${len}">${esc(w)}</span><span class="by"></span></div></div>
       </div><div class="marks"></div><button class="confirm" type="button" tabindex="-1">Reveal</button>`;
     el.addEventListener("click", (e) => {
@@ -461,11 +536,15 @@ function renderTurnPanel() {
   const g = S.game, m = me(), tp = $("#turnPanel");
   const focusedClue = document.activeElement && document.activeElement.id === "clueInput";
   if (focusedClue && g.phase === "clue" && m.team === g.turn && m.role === "spy") { updateTimer(); return; } // don't wipe a clue being typed
-  tp.className = `turn-panel ${g.phase === "over" ? "over" : g.turn}`;
+  const needsMe = (g.phase === "clue" && m.team === g.turn && m.role === "spy") || canGuess();
+  tp.className = `turn-panel ${g.phase === "over" ? "over" : g.turn} ${needsMe ? "mine" : ""}`;
+  const clueKey = `${g.id}:${g.turnNo}:${g.phase}`;
+  const slam = g.phase === "guess" && renderTurnPanel.clueKey !== clueKey;
+  renderTurnPanel.clueKey = clueKey;
   const spy = S.players.find((p) => p.team === g.turn && p.role === "spy");
   let html = "";
   if (g.phase === "over") {
-    const title = g.reason === "ended" ? "Game ended" : `${TEAM[g.winner]} win`;
+    const title = g.reason === "ended" ? "Game ended" : `${TEAM[g.winner]} wins`;
     html = `<div class="turn-line"><span class="turn-who">${g.winner ? glyph(g.winner) : ""}${esc(title)}</span>
       <button class="btn slim" data-result type="button">Show result</button></div>
       ${isHost() ? hostAfterButtons() : `<p class="turn-sub">Waiting for the host to start the next game.</p>`}`;
@@ -480,14 +559,14 @@ function renderTurnPanel() {
           <p class="form-error" id="clueError"></p>
         </form>`;
     } else {
-      html = `<div class="turn-line"><span class="turn-who">${glyph(g.turn)}${g.turn === "E" ? "Etreans’" : "Authority’s"} turn</span><span class="timer-text" id="timerText"></span></div>
-        <p class="turn-sub">${spy ? `Waiting for <b>${esc(spy.name)}</b>, the ${TEAM[g.turn]} spymaster, to give a clue.` : `${TEAM[g.turn]} have no spymaster. Someone needs to take the seat.`}</p>`;
+      html = `<div class="turn-line"><span class="turn-who">${glyph(g.turn)}${POSS[g.turn]} turn</span><span class="timer-text" id="timerText"></span></div>
+        <p class="turn-sub">${spy ? `Waiting for <b>${esc(spy.name)}</b>, the ${TEAM[g.turn]} spymaster, to give a clue.` : `${TEAM[g.turn]} has no spymaster. Someone needs to take the seat.`}</p>`;
     }
   } else {
     const myTurn = canGuess();
     const left = g.guessesLeft === null ? "Unlimited guesses" : `${g.guessesLeft} guess${g.guessesLeft === 1 ? "" : "es"} left`;
     html = `<div class="turn-line"><span class="turn-who">${glyph(g.turn)}${TEAM[g.turn]} guessing</span><span class="timer-text" id="timerText"></span></div>
-      <div class="turn-line"><div class="clue-show"><span class="clue-word">${esc(g.clue.word)}</span><span class="clue-num">${g.clue.n === "inf" ? "∞" : g.clue.n}</span></div>
+      <div class="turn-line"><div class="clue-show ${slam ? "slam" : ""}"><span class="clue-word">${esc(g.clue.word)}</span><span class="clue-num">${g.clue.n === "inf" ? "∞" : g.clue.n}</span></div>
       <div class="guess-info"><span class="guess-count">${left}</span>${myTurn ? `<button class="btn slim" data-endturn type="button" ${g.guessesMade < 1 ? "disabled title='Make at least one guess first'" : ""}>End turn</button>` : ""}</div></div>
       <p class="turn-sub">${myTurn ? "Tap a card to suggest it to your team, then press <b>Reveal</b> on it." : m.team === g.turn && m.role === "spy" ? "Your operatives are guessing. Stay quiet!" : `${TEAM[g.turn]} operatives are guessing.`}</p>`;
   }
@@ -528,7 +607,14 @@ function updateTimer() {
   const g = S && S.game, txt = $("#timerText"), bar = $("#timerBar");
   if (!g || !g.deadline || g.phase === "over") { if (txt) txt.textContent = ""; return; }
   const total = S.settings.timer * 1000, left = Math.max(0, g.deadline - (Date.now() + clockOffset));
-  if (txt) { const s = Math.ceil(left / 1000); txt.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; txt.classList.toggle("low", s <= 10); }
+  if (txt) {
+    const s = Math.ceil(left / 1000);
+    txt.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    txt.classList.toggle("low", s <= 10);
+    $("#turnPanel").classList.toggle("urgent", s <= 10 && s > 0);
+    if (s <= 5 && s > 0 && updateTimer.last !== s && me().team === g.turn) sfx.tick();
+    updateTimer.last = s;
+  }
   if (bar) bar.style.transform = `scaleX(${total ? left / total : 0})`;
 }
 setInterval(updateTimer, 250);
@@ -536,14 +622,14 @@ setInterval(updateTimer, 250);
 function showResult() {
   const g = S.game, ov = $("#overlay");
   let cls = g.winner || "", title, body, art;
-  if (g.reason === "ethiron") { cls = "X"; art = "X"; title = "Ethiron awakens"; body = `${TEAM[g.byTeam]} revealed Ethiron. ${TEAM[g.winner]} win.`; }
-  else if (g.reason === "agents") { art = g.winner; title = `${TEAM[g.winner]} win`; body = `Every ${g.winner === "E" ? "Etrean" : "Authority"} agent has been found.`; }
-  else if (g.reason === "gift") { art = g.winner; title = `${TEAM[g.winner]} win`; body = `${TEAM[g.byTeam]} revealed the last ${g.winner === "E" ? "Etrean" : "Authority"} agent for them.`; }
+  if (g.reason === "assassin") { cls = "X"; art = "X"; title = "The Vantablack Warrior rises"; body = `${TEAM[g.byTeam]} woke the Vantablack Warrior. ${TEAM[g.winner]} wins.`; }
+  else if (g.reason === "agents") { art = g.winner; title = `${TEAM[g.winner]} wins`; body = `Every ${TEAM[g.winner]} agent has been found.`; }
+  else if (g.reason === "gift") { art = g.winner; title = `${TEAM[g.winner]} wins`; body = `${TEAM[g.byTeam]} revealed the last ${TEAM[g.winner]} agent for them.`; }
   else { art = "B"; title = "Game ended"; body = "The host ended the game early."; }
   const m = me();
   const verdict = g.winner && m.team ? (m.team === g.winner ? "Your side won." : "Your side lost.") : "";
   ov.className = `overlay ${cls}`;
-  ov.innerHTML = `<div class="ov" role="dialog" aria-modal="true" aria-label="${esc(title)}">${glyph(art)}<h2>${esc(title)}</h2><p>${esc(body)} ${esc(verdict)}</p>
+  ov.innerHTML = `<div class="rays" aria-hidden="true"></div><div class="ov" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="ov-art">${glyph(art)}</div><h2>${esc(title)}</h2><p>${esc(body)} ${esc(verdict)}</p>
     ${isHost() ? hostAfterButtons() : `<p class="hint">Waiting for the host to start the next game.</p>`}
     <button class="btn ghost" data-closeov type="button">View the board</button></div>`;
   ov.hidden = false;
@@ -557,26 +643,39 @@ function effects(a, b) {
   if (!b || !b.game) return;
   const g = b.game, m = b.players.find((p) => p.id === b.you) || {};
   if (!a || !a.game || a.game.id !== g.id) {
-    if (a && a.game && a.game.id !== g.id) { overlayFor = null; sfx.start(); }
-    else if (a && !a.game) sfx.start();
+    if (a) {
+      overlayFor = null; sfx.start(); sfx.deal();
+      setTimeout(() => banner(`${TEAM[g.first]} goes first`, m.team === g.first ? "Your side has 7 agents" : "20 cards dealt", g.first), 900);
+    }
     return;
   }
   const og = a.game;
   g.revealed.forEach((r, i) => {
     if (r && !og.revealed[i]) {
       const el = cardEls[i];
-      if (el) { el.classList.add("just"); setTimeout(() => el.classList.remove("just"), 1100); }
-      sfx.flip();
       const role = g.roles[i], guesser = og.turn;
-      if (role === "X") { sfx.doom(); document.body.classList.remove("shake"); void document.body.offsetWidth; document.body.classList.add("shake"); }
+      if (el) {
+        el.classList.add("flipping", "just");
+        setTimeout(() => el.classList.remove("flipping"), 800);
+        setTimeout(() => el.classList.remove("just"), 1400);
+        setTimeout(() => window.FX && FX.reveal(el, role, role === guesser), 330);
+      }
+      sfx.flip();
+      if (role === "X") { sfx.doom(); shake(); }
       else if (role === guesser) sfx.good();
       else if (role === "B") sfx.neutral();
-      else sfx.bad();
+      else { sfx.bad(); shake(true); }
     }
   });
-  if (og.phase === "clue" && g.phase === "guess") sfx.bell();
-  if (og.phase !== "over" && g.phase === "over" && g.reason !== "ethiron" && g.winner) setTimeout(() => sfx.win(), 500);
-  if (g.phase === "clue" && (og.turn !== g.turn) && m.team === g.turn) setTimeout(() => sfx.turn(), 400);
+  if (og.phase === "clue" && g.phase === "guess") { sfx.bell(); banner(`${g.clue.word} · ${g.clue.n === "inf" ? "∞" : g.clue.n}`, `${TEAM[g.turn]} clue from ${g.clue.by}`, g.turn); }
+  if (og.phase !== "over" && g.phase === "over") {
+    if (g.reason === "assassin") setTimeout(() => window.FX && FX.doom(), 500);
+    else if (g.winner) setTimeout(() => { sfx.win(); window.FX && FX.celebrate(g.winner); }, 600);
+  }
+  if (g.phase === "clue" && og.turn !== g.turn && og.phase !== "over") {
+    setTimeout(() => banner(`${POSS[g.turn]} turn`, m.team === g.turn ? (m.role === "spy" ? "Give your clue" : "Your spymaster is thinking") : "", g.turn), 900);
+    if (m.team === g.turn) setTimeout(() => sfx.turn(), 900);
+  }
   if (g.phase !== "over" && m.team === g.turn) document.title = g.phase === "clue" && m.role === "spy" ? "Your clue · Deepnames" : g.phase === "guess" && m.role === "op" ? "Your turn · Deepnames" : "Deepnames";
   else document.title = "Deepnames";
 }

@@ -1,7 +1,7 @@
 // Deepnames word packs.
 // Names come from the Deepwoken wiki (deepwoken.fandom.com category pages), cleaned to
 // short in-game names. Cut and unreleased content is left out. Edit freely: one word
-// or short name per entry. Team names (Etris, Etrean, Authority) and Ethiron are
+// or short name per entry. Team names (Ministry, Authority) and the Vantablack Warrior are
 // filtered out automatically, duplicates are removed, and hosts can add custom words
 // from the lobby.
 
@@ -162,7 +162,7 @@ const PACKS = {
   }
 };
 
-const BANNED = /etris|etrea|authority|ethiron/i;
+const BANNED = /ministry|authority|vantablack/i;
 
 function wordsFor(packIds, custom = []) {
   const seen = new Set();

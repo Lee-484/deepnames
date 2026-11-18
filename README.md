@@ -1,6 +1,6 @@
 # Deepnames
 
-A Deepwoken-themed, real-time multiplayer take on Codenames. The **Etreans** face the **Authority** on a 4 × 5 board. Grey cards are bystanders, and **Ethiron** is the assassin: reveal it and your side loses on the spot.
+A Deepwoken-themed, real-time multiplayer take on Codenames. The **Ministry** faces the **Authority** on a 4 × 5 board. Grey cards are bystanders, and the **Vantablack Warrior** is the assassin: reveal it and your side loses on the spot.
 
 ## How it works
 
@@ -11,11 +11,11 @@ A Deepwoken-themed, real-time multiplayer take on Codenames. The **Etreans** fac
 
 ## Rules (standard Codenames, 20-card board)
 
-- The side that goes first has 7 agents; the other has 6. There are 6 bystanders and 1 Ethiron.
+- The side that goes first has 7 agents; the other has 6. There are 6 bystanders and 1 Vantablack Warrior.
 - The spymaster gives one word plus a number. The game rejects clues that match or contain a word still on the board.
 - Operatives tap a card to suggest it, then press **Reveal**. They get the number + 1 guesses; 0 or ∞ means unlimited. They must make at least one guess before ending the turn.
 - A bystander or a rival agent ends the turn. A rival agent also counts for the rival side.
-- Reveal Ethiron and you lose. Find all your agents and you win, even if the other side reveals your last one for you.
+- Reveal the Vantablack Warrior and you lose. Find all your agents and you win, even if the other side reveals your last one for you.
 - Anti-cheat: a player who has seen the key can't become an operative until the next game, and nobody can switch sides mid-game.
 
 ## Extras
@@ -23,7 +23,7 @@ A Deepwoken-themed, real-time multiplayer take on Codenames. The **Etreans** fac
 - Optional turn timer (60 s to 4 min; when it runs out the turn passes).
 - Host tools: shuffle teams, remove players, hand over hosting, end the game, rematch (with or without rotating spymasters).
 - Players reconnect to the same seat after a refresh or a dropped connection.
-- Sound effects, an Ethiron screen-shake ending and victory screens.
+- Animated dealing and card flips, particle bursts, turn banners, ambient embers, sound effects, a Vantablack Warrior ending and victory screens.
 - Word packs: 563 names taken from the Deepwoken wiki categories (races, oaths, attunements, locations, dungeons, monsters, bosses, NPCs, weapons, relics, mechanics), plus an optional everyday-words pack and custom words set in the lobby. Edit `words.js` to change them.
 
 ## Run it locally

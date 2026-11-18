@@ -81,7 +81,7 @@ async function settle(cs, pred = () => true) {
       }
     }
     assert.equal(room.game.phase, "over", "game finished");
-    games++; if (room.game.reason === "ethiron") ethiron++; else wins++;
+    games++; if (room.game.reason === "assassin") ethiron++; else wins++;
     await settle(all, () => all.every((c) => c.state.game.phase === "over"));
     for (const c of all) assert.ok(c.state.game.roles.every((x) => x), "full key shown at the end");
   }
@@ -108,7 +108,7 @@ async function settle(cs, pred = () => true) {
   await settle([watcher], () => watcher.kicked);
   assert.ok(watcher.kicked, "kicked player told");
 
-  console.log(`socket.test.js: ${games} full games over sockets (${wins} by agents, ${ethiron} by Ethiron), sync, secrecy, late join, reconnect and kick all OK`);
+  console.log(`socket.test.js: ${games} full games over sockets (${wins} by agents, ${ethiron} by the Vantablack Warrior), sync, secrecy, late join, reconnect and kick all OK`);
   for (const c of [...all, late, espy2]) c.s.close();
   server.close(); process.exit(0);
 })().catch((e) => { console.error(e); process.exit(1); });

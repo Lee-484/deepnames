@@ -8,11 +8,11 @@ const { PACKS, wordsFor, defaultPacks } = require("./words");
 const BOARD = 20;            // 4 × 5
 const FIRST_TEAM_AGENTS = 7; // the team that starts gets one extra agent
 const SECOND_TEAM_AGENTS = 6;
-const ETHIRON = 1;
-const BYSTANDERS = BOARD - FIRST_TEAM_AGENTS - SECOND_TEAM_AGENTS - ETHIRON; // 6
+const ASSASSIN = 1; // the Vantablack Warrior
+const BYSTANDERS = BOARD - FIRST_TEAM_AGENTS - SECOND_TEAM_AGENTS - ASSASSIN; // 6
 const MAX_PLAYERS = 30;
 const TIMER_CHOICES = [0, 60, 90, 120, 180, 240];
-const TEAM_NAME = { E: "Etreans", A: "Authority" };
+const TEAM_NAME = { E: "Ministry", A: "Authority" }; // internal codes: E = Ministry (red), A = Authority (blue), B = bystander, X = Vantablack Warrior
 
 class GameError extends Error {}
 const fail = (msg) => { throw new GameError(msg); };
@@ -159,8 +159,8 @@ class Room {
   readiness() {
     const issues = [];
     for (const t of ["E", "A"]) {
-      if (!this.spyOf(t)) issues.push(`${TEAM_NAME[t]} need a spymaster`);
-      if (!this.opsOf(t).length) issues.push(`${TEAM_NAME[t]} need at least one operative`);
+      if (!this.spyOf(t)) issues.push(`${TEAM_NAME[t]} needs a spymaster`);
+      if (!this.opsOf(t).length) issues.push(`${TEAM_NAME[t]} needs at least one operative`);
     }
     if (this.pool().length < BOARD) issues.push(`Turn on more word packs (need ${BOARD} words)`);
     return issues;
@@ -177,7 +177,7 @@ class Room {
       ...Array(FIRST_TEAM_AGENTS).fill(first),
       ...Array(SECOND_TEAM_AGENTS).fill(other(first)),
       ...Array(BYSTANDERS).fill("B"),
-      ...Array(ETHIRON).fill("X"),
+      ...Array(ASSASSIN).fill("X"),
     ]);
     this.game = {
       id: crypto.randomUUID(),
@@ -292,7 +292,7 @@ class Room {
     const role = g.roles[i], team = g.turn;
     g.log.push({ k: "reveal", team, by: p.name, word: g.words[i], role, i });
 
-    if (role === "X") return this.finish(other(team), "ethiron", team);
+    if (role === "X") return this.finish(other(team), "assassin", team);
     if (role === "E" || role === "A") {
       if (this.remaining(role) === 0) return this.finish(role, role === team ? "agents" : "gift", team);
     }
